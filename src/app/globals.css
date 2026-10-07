@@ -182,9 +182,11 @@ a { color: inherit; text-decoration: none; }
 .terminal-line.err { color: #ee979d; }
 .terminal-line.ok { color: #92e2bf; }
 .terminal-line.sys { color: #688b7d; }
-.terminal-input-wrap { display: flex; align-items: center; gap: 9px; padding: 9px 14px 13px; border-top: 1px solid #26332e; color: var(--lime); font-family: ui-monospace,monospace; font-size: 11px; }
-.terminal-input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: #ecf6e7; font-family: inherit; font-size: inherit; }
-.terminal-input::placeholder { color: #5e7667; }
+.terminal-active-line { display: flex; align-items: center; margin-top: 3px; color: var(--lime); }
+.terminal-prompt { flex: none; white-space: pre; color: var(--lime); }
+.terminal-input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: #ecf6e7; font-family: inherit; font-size: inherit; line-height: inherit; caret-color: #d3f77f; }
+.terminal-run { flex: none; margin-left: 6px; color: var(--lime); line-height: 0; transition: opacity .15s; }
+.terminal-run:disabled { opacity: .25; cursor: default; }
 
 .modal-backdrop { position: fixed; inset: 0; z-index: 100; display: flex; justify-content: center; align-items: flex-start; padding: 13vh 20px 30px; background: rgba(3,7,11,.75); backdrop-filter: blur(8px); }
 .command-modal { width: min(580px,100%); overflow: hidden; border: 1px solid #46534b; border-radius: 15px; background: #171e26; box-shadow: 0 25px 90px rgba(0,0,0,.6); }
