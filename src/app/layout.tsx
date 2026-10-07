@@ -22,8 +22,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const lang: Lang = preferred === "el" ? "el" : "en";
   const state = await getPlatformState();
   const searchItems = [
-    { title: "Dashboard", titleEl: "Αρχική", subtitle: "Your command center", subtitleEl: "Το κέντρο ελέγχου σου", href: "/", type: "Page" },
-    { title: "Challenges", titleEl: "Προκλήσεις", subtitle: "Capture your next flag", subtitleEl: "Βρες την επόμενη σημαία", href: "/challenges", type: "Page" },
+    { title: "Dashboard", titleEl: "Πίνακας ελέγχου", subtitle: "Your command center", subtitleEl: "Το κέντρο ελέγχου σου", href: "/dashboard", type: "Page" },
+    { title: "Challenges", titleEl: "Προκλήσεις", subtitle: "Capture your next flag", subtitleEl: "Βρες το επόμενο flag", href: "/challenges", type: "Page" },
     { title: "Leaderboard", titleEl: "Κατάταξη", subtitle: "Meet the top operators", subtitleEl: "Γνώρισε τους κορυφαίους παίκτες", href: "/leaderboard", type: "Page" },
     ...CHALLENGES.map(challenge => ({ title: challenge.title, titleEl: challengeCopy(challenge, "el").title, subtitle: `${challenge.category} · ${challenge.points} XP`, subtitleEl: `${challengeCopy(challenge, "el").summary} · ${challenge.points} XP`, href: `/challenges/${challenge.id}`, type: "Challenge" })),
     ...CAMPAIGNS.map(campaign => ({ title: campaign.title.en, titleEl: campaign.title.el, subtitle: `${campaign.modules.length} hands-on labs`, subtitleEl: `${campaign.modules.length} πρακτικά εργαστήρια`, href: `/academy/${campaign.id}`, type: "Learning path" })),

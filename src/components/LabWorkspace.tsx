@@ -113,13 +113,13 @@ export default function LabWorkspace({ campaignId, moduleId, playerId, initialCo
   };
 
   const reset = () => {
-    if (!window.confirm(lang === "el" ? "Επαναφορά προσομοιωμένου τερματικού; Τα XP και οι ολοκληρωμένοι στόχοι παραμένουν αποθηκευμένοι." : "Reset this simulated terminal and its command history? Saved XP and completed objectives will stay on your account.")) return;
+    if (!window.confirm(lang === "el" ? "Να γίνει επαναφορά του τερματικού; Τα XP που έχεις κερδίσει και οι ολοκληρωμένοι στόχοι δεν θα χαθούν." : "Reset this simulated terminal and its command history? Saved XP and completed objectives will stay on your account.")) return;
     const fresh = activateTerminalForModule(createPlayerTerminal(), moduleId, lesson.scenario || campaign.scenario);
     termRef.current = fresh;
     savePlayerTerminal(playerId, fresh); setTerm({ ...fresh, lines: [...fresh.lines] });
     commandHistory.current = []; setInput(""); setLastResult(null);
     try { localStorage.removeItem(key); } catch { /* Browser storage may be unavailable. */ }
-    setNotice(lang === "el" ? "Η προσομοίωση επανήλθε. Η πρόοδός σου είναι ασφαλής." : "Sandbox reset. Your earned progress is safe.");
+    setNotice(lang === "el" ? "Η προσομοίωση επανεκκινήθηκε. Η πρόοδός σου διατηρήθηκε." : "Sandbox reset. Your earned progress is safe.");
   };
   const copyCommand = async (command: string) => {
     await navigator.clipboard.writeText(command);

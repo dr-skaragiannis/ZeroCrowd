@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight, Award, BookOpen, CalendarDays, Check, ChevronRight, Fingerprint, Flag, Flame, LockKeyhole, MapPin, Settings2, ShieldCheck, Sparkles, TerminalSquare, Trophy, Zap } from "lucide-react";
 import { Avatar, ProgressBar, SectionTitle, StatCard, timeAgo } from "@/components/ui";
 import ProfileEditor from "@/components/ProfileEditor";
+import AccountSecurity from "@/components/AccountSecurity";
 import { useProgress } from "@/components/ProgressProvider";
 import type { ChallengeCategory, PublicChallenge } from "@/lib/challenges";
 import { operatorRank, operatorTitle } from "@/lib/progress";
@@ -42,6 +43,8 @@ export default function ProfileView({ initialLeaderboard, challenges }: { initia
       <div className="relative flex flex-wrap items-end justify-between gap-4 px-6 pb-6 md:px-8"><div className="flex flex-wrap items-end gap-4"><div className="-mt-8 rounded-2xl border-4 border-[#141a23]"><Avatar name={player.displayName} size="lg" /></div><div className="pb-1"><div className="flex flex-wrap items-center gap-2"><h2 className="display-font text-[24px] font-bold tracking-[-.045em]">{player.displayName}</h2><span className="rounded border border-[#526843] bg-[#29392b] px-2 py-1 text-[9px] font-bold text-lime"><T>LEVEL</T> {level}</span></div><p className="mt-1 text-[11px] text-[#91a2ab]">@{player.handle} <span className="mx-1 text-[#52616a]">·</span> {operatorTitle(xp)}</p></div></div><div className="mb-1"><ProfileEditor /></div>
         <div className="w-full border-t border-[#2c3740] pt-4"><p className="text-[11px] text-[#acb9b8]">{player.bio}</p><div className="mt-3 flex flex-wrap gap-4 text-[10px] text-[#82959e]"><span className="inline-flex items-center gap-1.5"><MapPin size={12} />{player.location}</span><span className="inline-flex items-center gap-1.5"><CalendarDays size={12} /><T>Joined</T> {new Date(player.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</span><span className="inline-flex items-center gap-1.5"><ShieldCheck size={12} />{player.isGuest ? "Guest operator" : "Verified operator"}</span></div></div></div>
     </section>
+
+    <div id="account-security"><AccountSecurity /></div>
 
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4"><StatCard label="Total XP" value={xp.toLocaleString()} foot="Keep earning" icon={<Zap size={17} />} /><StatCard label="Global rank" value={`#${String(rank).padStart(2, "0")}`} foot="Among operators" icon={<Trophy size={17} />} color="violet" /><StatCard label="Flags captured" value={String(solves.length).padStart(2, "0")} foot="Challenges solved" icon={<Flag size={17} />} color="cyan" /><StatCard label="Labs completed" value={String(completedLabs).padStart(2, "0")} foot="Skills sharpened" icon={<TerminalSquare size={17} />} color="orange" /></div>
 

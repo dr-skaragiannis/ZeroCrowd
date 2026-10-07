@@ -76,44 +76,44 @@ export const MODULES: Module[] = [
     icon: "terminal",
     color: "from-ember-500 to-ember-700",
     difficulty: 1,
-    title: { en: "Terminal & Linux Foundations", el: "Τερματικό & Θεμέλια Linux" },
-    subtitle: { en: "Meet the command line, then navigate it", el: "Γνώρισε τη γραμμή εντολών και πλοηγήσου" },
-    badge: { en: "Shell Initiate", el: "Μυημένος του Shell" },
+    title: { en: "Terminal & Linux Foundations", el: "Τερματικό και βασικές αρχές Linux" },
+    subtitle: { en: "Meet the command line, then navigate it", el: "Γνώρισε τη γραμμή εντολών και μάθε να τη χρησιμοποιείς" },
+    badge: { en: "Shell Initiate", el: "Πρώτα βήματα στο shell" },
     theory: [
       {
-        heading: { en: "What is a terminal / CLI?", el: "Τι είναι το τερματικό / CLI;" },
+        heading: { en: "What is a terminal / CLI?", el: "Τι είναι το τερματικό (CLI);" },
         body: {
           en: "A terminal is a text window where you talk to the computer by typing commands instead of clicking. This is the Command Line Interface (CLI), driven by a program called the shell (here, bash). You type one line, press Enter, and the shell runs it and prints the result. Almost every hacking and security tool lives here — mastering the CLI is the single most important skill for a security professional.",
-          el: "Το τερματικό είναι ένα παράθυρο κειμένου όπου μιλάς στον υπολογιστή γράφοντας εντολές αντί να κάνεις κλικ. Αυτό είναι το Command Line Interface (CLI), που το οδηγεί ένα πρόγραμμα, το shell (εδώ, bash). Γράφεις μια γραμμή, πατάς Enter, το shell την εκτελεί και τυπώνει το αποτέλεσμα. Σχεδόν κάθε εργαλείο χάκινγκ ζει εδώ — η κατοχή του CLI είναι η πιο σημαντική δεξιότητα ενός επαγγελματία ασφάλειας.",
+          el: "Το τερματικό είναι ένα παράθυρο κειμένου όπου πληκτρολογείς εντολές αντί να χρησιμοποιείς το ποντίκι. Έτσι επικοινωνείς με τον υπολογιστή μέσω της γραμμής εντολών (CLI), χρησιμοποιώντας ένα πρόγραμμα που λέγεται shell — εδώ, το bash. Πληκτρολογείς μια εντολή και πατάς Enter· το shell την εκτελεί και εμφανίζει το αποτέλεσμα. Τα περισσότερα εργαλεία κυβερνοασφάλειας χρησιμοποιούνται από τη γραμμή εντολών, γι’ αυτό η εξοικείωση με το CLI είναι βασική δεξιότητα.",
         },
       },
       {
-        heading: { en: "Reading the prompt", el: "Διαβάζοντας το prompt" },
+        heading: { en: "Reading the prompt", el: "Πώς διαβάζουμε το prompt" },
         body: {
           en: "Before every command the shell shows a prompt, e.g. operator@kali:~$. It tells you WHO you are (operator), WHICH machine (kali) and WHERE you are (~ = home). The $ means a normal user; a # would mean you are root (admin). You type your command right after it and press Enter to run it.",
-          el: "Πριν από κάθε εντολή το shell δείχνει ένα prompt, π.χ. operator@kali:~$. Σου λέει ΠΟΙΟΣ είσαι (operator), ΠΟΙΟ μηχάνημα (kali) και ΠΟΥ βρίσκεσαι (~ = home). Το $ σημαίνει απλός χρήστης· ένα # θα σήμαινε ότι είσαι root (διαχειριστής). Γράφεις την εντολή αμέσως μετά και πατάς Enter.",
+          el: "Πριν από κάθε εντολή, το shell εμφανίζει το prompt, π.χ. operator@kali:~$. Εκεί βλέπεις το όνομα χρήστη (operator), το μηχάνημα (kali) και τον τρέχοντα φάκελο (~ σημαίνει τον προσωπικό σου φάκελο). Το $ δηλώνει απλό χρήστη, ενώ το # δηλώνει root (διαχειριστή). Πληκτρολόγησε την εντολή μετά το prompt και πάτησε Enter.",
         },
       },
       {
-        heading: { en: "Work faster: Tab, history, clear", el: "Δούλεψε πιο γρήγορα: Tab, ιστορικό, clear" },
+        heading: { en: "Work faster: Tab, history, clear", el: "Εξοικονόμησε χρόνο με Tab, ιστορικό και clear" },
         body: {
           en: "Pros rarely type full commands. Press Tab to auto-complete a command or filename. Press ↑ and ↓ to scroll through commands you already ran. When the screen gets messy, type clear (or Ctrl+L). And help lists every command available in this lab.",
-          el: "Οι επαγγελματίες σπάνια γράφουν ολόκληρες εντολές. Πάτα Tab για αυτόματη συμπλήρωση. Πάτα ↑ και ↓ για το ιστορικό. Γράψε clear (ή Ctrl+L) για καθαρισμό. Το help εμφανίζει όλες τις διαθέσιμες εντολές.",
+          el: "Οι έμπειροι χρήστες δεν πληκτρολογούν κάθε εντολή από την αρχή. Πάτησε Tab για αυτόματη συμπλήρωση εντολής ή ονόματος αρχείου. Με τα ↑ και ↓ βλέπεις τις εντολές που έχεις ήδη εκτελέσει. Αν γεμίσει η οθόνη, γράψε clear (ή πάτησε Ctrl+L). Με το help βλέπεις ποιες εντολές υποστηρίζει το εργαστήριο.",
         },
         tip: {
           en: "Tab is your best friend: it saves time AND prevents typos in long filenames.",
-          el: "Το Tab είναι ο καλύτερός σου φίλος: γλιτώνει χρόνο ΚΑΙ αποτρέπει λάθη.",
+          el: "Το Tab είναι ο καλύτερός σου φίλος: κερδίζεις χρόνο και αποφεύγεις τυπογραφικά λάθη, ειδικά σε μεγάλα ονόματα αρχείων.",
         },
       },
       {
         heading: { en: "Where am I? (pwd, ls, cd, cat)", el: "Πού βρίσκομαι;" },
         body: {
           en: "The filesystem is a tree that starts at the root /. pwd prints your current location. ls lists a folder; ls -a also reveals hidden files (names starting with a dot). cd folder moves in, cd .. goes up, and cat file prints a file's contents.",
-          el: "Το σύστημα αρχείων είναι ένα δέντρο από τη ρίζα /. Το pwd δείχνει τη θέση σου. Το ls εμφανίζει φάκελο· το ls -a αποκαλύπτει κρυφά αρχεία. Το cd μπαίνει σε φάκελο, το cd .. ανεβαίνει, και το cat τυπώνει αρχείο.",
+          el: "Το σύστημα αρχείων οργανώνεται σαν δέντρο με ρίζα το /. Η εντολή pwd δείχνει τον τρέχοντα φάκελο. Η ls εμφανίζει αρχεία και φακέλους· με ls -a βλέπεις και τα κρυφά αρχεία. Η cd σε μεταφέρει σε άλλον φάκελο, η cd .. έναν φάκελο πιο πάνω και η cat εμφανίζει το περιεχόμενο ενός αρχείου.",
         },
         tip: {
           en: "Hidden files are a favorite place to stash secrets and config — always check with ls -a.",
-          el: "Τα κρυφά αρχεία είναι αγαπημένο σημείο για μυστικά — έλεγχε πάντα με ls -a.",
+          el: "Τα κρυφά αρχεία συχνά περιέχουν ευαίσθητες πληροφορίες ή ρυθμίσεις — έλεγχε πάντα με ls -a.",
         },
       },
     ],
@@ -133,7 +133,7 @@ export const MODULES: Module[] = [
         hint: { en: "help", el: "help" },
         explain: {
           en: "WHY: When you sit at an unfamiliar shell, learn what you can do first. HOW: type help and press Enter.",
-          el: "ΓΙΑΤΙ: Σε άγνωστο shell, μάθε πρώτα τι μπορείς να κάνεις. ΠΩΣ: γράψε help και πάτα Enter.",
+          el: "ΓΙΑΤΙ: Σε ένα άγνωστο shell, πρώτα μάθε ποιες δυνατότητες έχεις. ΠΩΣ: γράψε help και πάτησε Enter.",
         },
         check: (t) => usedCmd(t, /^\s*help\b/),
       },
@@ -143,7 +143,7 @@ export const MODULES: Module[] = [
         hint: { en: "whoami", el: "whoami" },
         explain: {
           en: "WHY: Always know which user you are before you act. HOW: whoami prints the current account name.",
-          el: "ΓΙΑΤΙ: Πάντα να ξέρεις ποιος χρήστης είσαι. ΠΩΣ: το whoami τυπώνει το όνομα λογαριασμού.",
+          el: "ΓΙΑΤΙ: Πριν ενεργήσεις, βεβαιώσου με ποιον λογαριασμό είσαι συνδεδεμένος. ΠΩΣ: η whoami εμφανίζει το όνομα χρήστη.",
         },
         check: (t) => t.flags.has("whoami") || usedCmd(t, /^\s*whoami\b/),
       },
@@ -159,7 +159,7 @@ export const MODULES: Module[] = [
       },
       {
         id: "ls",
-        instruction: { en: "List the files in your home with ls.", el: "Λίσταρχεία στο home με ls." },
+        instruction: { en: "List the files in your home with ls.", el: "Εμφάνισε τα αρχεία του προσωπικού σου φακέλου με ls." },
         hint: { en: "ls", el: "ls" },
         explain: {
           en: "WHY: See what is around you. HOW: ls lists the current directory.",
@@ -180,21 +180,21 @@ export const MODULES: Module[] = [
     ],
     challenges: [
       {
-        title: { en: "Hidden in the home", el: "Κρυμμένο στο home" },
+        title: { en: "Hidden in the home", el: "Κρυμμένο στον προσωπικό φάκελο" },
         brief: {
           en: "There is a hidden file in your home directory. Find it and read it.",
           el: "Υπάρχει κρυφό αρχείο στο home. Βρες το και διάβασέ το.",
         },
-        success: { en: "You uncovered a dotfile. Operators always ls -a.", el: "Αποκάλυψες ένα dotfile. Οι χειριστές πάντα κάνουν ls -a." },
+        success: { en: "You uncovered a dotfile. Operators always ls -a.", el: "Βρήκες ένα κρυφό αρχείο. Γι’ αυτό έλεγχε πάντα με ls -a." },
         check: (t) => t.flags.has("read-secret") || t.flags.has("saw:FLAG{hidden_in_plain_sight}"),
       },
       {
-        title: { en: "Leave a trail", el: "Άσε ίχνος" },
+        title: { en: "Leave a trail", el: "Άφησε τα ίχνη σου" },
         brief: {
           en: "Change into the documents folder, then prove you were there by reading readme.md.",
           el: "Μπες στον φάκελο documents και διάβασε το readme.md.",
         },
-        success: { en: "Navigation locked in.", el: "Η πλοήγηση κλείδωσε." },
+        success: { en: "Navigation locked in.", el: "Τώρα ξέρεις να κινείσαι στο σύστημα αρχείων." },
         check: (t) => t.filesRead.some((p) => p.includes("readme.md")) || usedCmd(t, /cat\s+.*readme/),
       },
     ],
@@ -205,26 +205,26 @@ export const MODULES: Module[] = [
     icon: "folder",
     color: "from-amber-500 to-orange-700",
     difficulty: 1,
-    title: { en: "Files, Paths & Hunting", el: "Αρχεία, διαδρομές & αναζήτηση" },
-    subtitle: { en: "find, grep and the shape of the tree", el: "find, grep και το δέντρο αρχείων" },
-    badge: { en: "File Hunter", el: "Κυνηγός αρχείων" },
+    title: { en: "Files, Paths & Hunting", el: "Αρχεία, διαδρομές και αναζήτηση" },
+    subtitle: { en: "find, grep and the shape of the tree", el: "Βρες αρχεία και περιεχόμενο με find και grep" },
+    badge: { en: "File Hunter", el: "Ερευνητής αρχείων" },
     theory: [
       {
-        heading: { en: "Absolute vs relative paths", el: "Απόλυτες vs σχετικές διαδρομές" },
+        heading: { en: "Absolute vs relative paths", el: "Απόλυτες και σχετικές διαδρομές" },
         body: {
           en: "An absolute path starts at / (e.g. /etc/passwd). A relative path starts from where you are (e.g. ../notes.txt). ~ always means your home. Mixing them up is the #1 beginner trap.",
-          el: "Μια απόλυτη διαδρομή ξεκινά από / (π.χ. /etc/passwd). Μια σχετική ξεκινά από εκεί που είσαι. Το ~ είναι πάντα το home.",
+          el: "Η απόλυτη διαδρομή ξεκινά από το /, π.χ. /etc/passwd. Η σχετική διαδρομή ξεκινά από τον φάκελο όπου βρίσκεσαι, π.χ. ../notes.txt. Το ~ συμβολίζει πάντα τον προσωπικό σου φάκελο.",
         },
       },
       {
         heading: { en: "find and grep", el: "find και grep" },
         body: {
           en: "find /home -name '*.txt' walks a tree looking for names. grep PATTERN file searches inside a file. Together they are how you hunt secrets, configs and leftovers on a box.",
-          el: "Το find περπατά το δέντρο. Το grep ψάχνει μέσα σε αρχείο. Μαζί κυνηγάς μυστικά και ρυθμίσεις.",
+          el: "Η find διατρέχει τους φακέλους και εντοπίζει αρχεία με βάση το όνομά τους. Η grep ψάχνει για συγκεκριμένο κείμενο μέσα σε αρχεία. Μαζί, σε βοηθούν να βρεις αρχεία, ρυθμίσεις και χρήσιμες πληροφορίες.",
         },
         tip: {
           en: "On a real engagement, start with find and grep before you install anything new.",
-          el: "Σε πραγματικό engagement, ξεκίνα με find και grep πριν εγκαταστήσεις οτιδήποτε.",
+          el: "Σε μια εξουσιοδοτημένη έρευνα, ξεκίνα με find και grep πριν εγκαταστήσεις νέα εργαλεία.",
         },
       },
     ],
@@ -256,26 +256,26 @@ export const MODULES: Module[] = [
       },
       {
         id: "grep-todo",
-        instruction: { en: "grep the word enumerate inside notes.txt.", el: "Κάνε grep τη λέξη enumerate στο notes.txt." },
+        instruction: { en: "grep the word enumerate inside notes.txt.", el: "Χρησιμοποίησε grep για να βρεις τη λέξη enumerate στο notes.txt." },
         hint: { en: "grep enumerate notes.txt", el: "grep enumerate notes.txt" },
         explain: {
           en: "WHY: grep pulls signal out of noise. HOW: grep enumerate notes.txt",
-          el: "ΓΙΑΤΙ: το grep βγάζει σήμα από θόρυβο.",
+          el: "ΓΙΑΤΙ: Με το grep ξεχωρίζεις τις χρήσιμες πληροφορίες μέσα στον θόρυβο.",
         },
         check: (t) => t.flags.has("grep") || usedCmd(t, /^\s*grep\b/),
       },
     ],
     challenges: [
       {
-        title: { en: "Wordlist in the toolbox", el: "Wordlist στα εργαλεία" },
-        brief: { en: "Read the wordlist in your tools folder.", el: "Διάβασε το wordlist στον φάκελο tools." },
-        success: { en: "You found the dictionary. Brute-force labs will need it.", el: "Βρήκες το λεξικό." },
+        title: { en: "Wordlist in the toolbox", el: "Λίστα λέξεων στα εργαλεία" },
+        brief: { en: "Read the wordlist in your tools folder.", el: "Διάβασε τη λίστα λέξεων στον φάκελο tools." },
+        success: { en: "You found the dictionary. Brute-force labs will need it.", el: "Βρήκες τη λίστα λέξεων — θα σου χρειαστεί σε εργαστήρια brute-force." },
         check: (t) => t.flags.has("read-wordlist"),
       },
       {
-        title: { en: "Hosts file intel", el: "Πληροφορίες hosts" },
+        title: { en: "Hosts file intel", el: "Αρχείο hosts" },
         brief: { en: "Read /etc/hosts and learn the lab hostnames.", el: "Διάβασε το /etc/hosts." },
-        success: { en: "Name resolution mapped.", el: "Η ανάλυση ονομάτων χαρτογραφήθηκε." },
+        success: { en: "Name resolution mapped.", el: "Τώρα ξέρεις πώς αντιστοιχούν τα ονόματα των host στις διευθύνσεις IP." },
         check: (t) => t.flags.has("read-hosts"),
       },
     ],
@@ -286,22 +286,22 @@ export const MODULES: Module[] = [
     icon: "lock",
     color: "from-violet-500 to-purple-800",
     difficulty: 2,
-    title: { en: "Permissions & Identity", el: "Δικαιώματα & ταυτότητα" },
-    subtitle: { en: "ls -l, sudo -l, and why root is a big deal", el: "ls -l, sudo -l και γιατί το root μετράει" },
-    badge: { en: "Gatekeeper", el: "Θυρωρός" },
+    title: { en: "Permissions & Identity", el: "Δικαιώματα και ταυτότητα" },
+    subtitle: { en: "ls -l, sudo -l, and why root is a big deal", el: "ls -l, sudo -l και γιατί έχει σημασία ο root" },
+    badge: { en: "Gatekeeper", el: "Έλεγχος πρόσβασης" },
     theory: [
       {
         heading: { en: "rwx and ls -l", el: "rwx και ls -l" },
         body: {
           en: "Every file has a mode string like -rw-r--r--. The first char is type (- file, d directory). Then three triples: owner, group, others — read, write, execute. ls -l shows this. Permission denied means you asked for a bit you do not have.",
-          el: "Κάθε αρχείο έχει mode όπως -rw-r--r--. Το ls -l το δείχνει. Permission denied σημαίνει ότι ζήτησες bit που δεν έχεις.",
+          el: "Κάθε αρχείο έχει μια συμβολοσειρά δικαιωμάτων, π.χ. -rw-r--r--. Ο πρώτος χαρακτήρας δείχνει τον τύπο του (- για αρχείο, d για φάκελο). Ακολουθούν τριάδες δικαιωμάτων για ιδιοκτήτη, ομάδα και άλλους: ανάγνωση, εγγραφή και εκτέλεση. Η ls -l τα εμφανίζει. Το Permission denied σημαίνει ότι δεν έχεις τα απαιτούμενα δικαιώματα.",
         },
       },
       {
-        heading: { en: "sudo and the principle of least privilege", el: "sudo και ελάχιστο προνόμιο" },
+        heading: { en: "sudo and the principle of least privilege", el: "sudo και η αρχή των ελάχιστων προνομίων" },
         body: {
           en: "sudo lets a user run a command as root. sudo -l lists what YOU are allowed to run. On a pentest, sudo -l is one of the first privilege-escalation checks — misconfigured sudo is a classic path to root. Never run sudo on a system you do not own.",
-          el: "Το sudo τρέχει εντολή ως root. Το sudo -l δείχνει τι ΕΠΙΤΡΕΠΕΤΑΙ σε σένα. Σε pentest είναι από τους πρώτους ελέγχους ανύψωσης προνομίων.",
+          el: "Το sudo επιτρέπει την εκτέλεση μιας εντολής με δικαιώματα root. Η sudo -l δείχνει ποιες εντολές επιτρέπεται να εκτελέσεις. Σε ένα pentest είναι από τους πρώτους ελέγχους για κλιμάκωση προνομίων: μια λανθασμένη ρύθμιση sudo μπορεί να δώσει πρόσβαση root. Μη χρησιμοποιείς sudo σε σύστημα που δεν σου ανήκει.",
         },
       },
     ],
@@ -315,35 +315,35 @@ export const MODULES: Module[] = [
         id: "lsl",
         instruction: { en: "Run ls -l in your home to see file modes.", el: "Τρέξε ls -l στο home." },
         hint: { en: "ls -l", el: "ls -l" },
-        explain: { en: "WHY: Modes tell you what you can touch.", el: "ΓΙΑΤΙ: Τα modes λένε τι μπορείς να αγγίξεις." },
+        explain: { en: "WHY: Modes tell you what you can touch.", el: "ΓΙΑΤΙ: Τα δικαιώματα καθορίζουν ποια αρχεία μπορείς να διαβάσεις ή να αλλάξεις." },
         check: (t) => t.flags.has("ls-l") || usedCmd(t, /ls\s+-[al]*l/),
       },
       {
         id: "id",
         instruction: { en: "Run id to see uid/gid/groups.", el: "Τρέξε id." },
         hint: { en: "id", el: "id" },
-        explain: { en: "WHY: Groups often grant extra rights (sudo, docker, disk).", el: "ΓΙΑΤΙ: Οι ομάδες δίνουν έξτρα δικαιώματα." },
+        explain: { en: "WHY: Groups often grant extra rights (sudo, docker, disk).", el: "ΓΙΑΤΙ: Η συμμετοχή σε ομάδες μπορεί να σου δώσει πρόσβαση σε επιπλέον πόρους." },
         check: (t) => t.flags.has("id") || usedCmd(t, /^\s*id\b/),
       },
       {
         id: "sudo-l",
-        instruction: { en: "Ask sudo what you are allowed to run: sudo -l", el: "Ρώτα το sudo: sudo -l" },
+        instruction: { en: "Ask sudo what you are allowed to run: sudo -l", el: "Έλεγξε ποιες εντολές μπορείς να εκτελέσεις με sudo: sudo -l" },
         hint: { en: "sudo -l", el: "sudo -l" },
-        explain: { en: "WHY: Misconfigured sudo is a highway to root.", el: "ΓΙΑΤΙ: Λάθος sudo οδηγεί σε root." },
+        explain: { en: "WHY: Misconfigured sudo is a highway to root.", el: "ΓΙΑΤΙ: Μια λανθασμένη ρύθμιση sudo μπορεί να οδηγήσει σε πρόσβαση root." },
         check: (t) => t.flags.has("sudo-l") || usedCmd(t, /sudo\s+-l/),
       },
     ],
     challenges: [
       {
-        title: { en: "Shadow is not for you", el: "Το shadow δεν είναι για σένα" },
+        title: { en: "Shadow is not for you", el: "Το /etc/shadow είναι προστατευμένο" },
         brief: { en: "Try to read /etc/shadow. Observe the denial. That is the lesson.", el: "Δοκίμασε να διαβάσεις /etc/shadow." },
-        success: { en: "Denied — as it should be. Root-only files exist for a reason.", el: "Άρνηση — όπως πρέπει." },
+        success: { en: "Denied — as it should be. Root-only files exist for a reason.", el: "Η πρόσβαση απορρίφθηκε — όπως πρέπει. Ορισμένα αρχεία είναι προσβάσιμα μόνο από τον root." },
         check: (t) => usedCmd(t, /cat\s+\/etc\/shadow/),
       },
       {
-        title: { en: "Who is root, really?", el: "Ποιος είναι root;" },
-        brief: { en: "Confirm with whoami after reviewing sudo -l — stay a mortal for now.", el: "Επιβεβαίωσε με whoami — μείνε απλός χρήστης προς το παρόν." },
-        success: { en: "Identity check complete.", el: "Έλεγχος ταυτότητας OK." },
+        title: { en: "Who is root, really?", el: "Ποιος είναι πραγματικά ο root;" },
+        brief: { en: "Confirm with whoami after reviewing sudo -l — stay a mortal for now.", el: "Έλεγξε ξανά με whoami αφού δεις τη sudo -l. Προς το παρόν, παρέμεινε απλός χρήστης." },
+        success: { en: "Identity check complete.", el: "Ο έλεγχος ταυτότητας ολοκληρώθηκε." },
         check: (t) => t.flags.has("whoami") && t.flags.has("sudo-l"),
       },
     ],
@@ -354,22 +354,22 @@ export const MODULES: Module[] = [
     icon: "wifi",
     color: "from-cyan-500 to-sky-800",
     difficulty: 2,
-    title: { en: "Networking Primer", el: "Εισαγωγή στα δίκτυα" },
-    subtitle: { en: "Interfaces, ping, and the lab subnet", el: "Διεπαφές, ping και το subnet του lab" },
-    badge: { en: "Packet Rider", el: "Αναβάτης πακέτων" },
+    title: { en: "Networking Primer", el: "Εισαγωγή στη δικτύωση" },
+    subtitle: { en: "Interfaces, ping, and the lab subnet", el: "Διεπαφές, ping και υποδίκτυο του εργαστηρίου" },
+    badge: { en: "Packet Rider", el: "Ιχνηλάτης πακέτων" },
     theory: [
       {
         heading: { en: "Your address on the wire", el: "Η διεύθυνσή σου στο δίκτυο" },
         body: {
           en: "ip addr (or ifconfig) shows your interfaces. In this lab you are 10.10.10.2/24 — a private training net. Hosts you will attack later live in 10.10.10.0/24. Ping proves a host is up (if ICMP is allowed).",
-          el: "Το ip addr δείχνει τις διεπαφές. Εδώ είσαι 10.10.10.2/24. Οι στόχοι ζουν στο 10.10.10.0/24.",
+          el: "Η ip addr (ή η ifconfig) εμφανίζει τις δικτυακές διεπαφές. Στο εργαστήριο έχεις τη διεύθυνση 10.10.10.2/24 — σε ένα ιδιωτικό δίκτυο εξάσκησης. Οι στόχοι βρίσκονται στο υποδίκτυο 10.10.10.0/24. Η ping ελέγχει αν ένας host απαντά, εφόσον επιτρέπεται η κίνηση ICMP.",
         },
       },
       {
         heading: { en: "Ethics of scanning", el: "Ηθική της σάρωσης" },
         body: {
           en: "Sending packets at a host you do not own can be illegal. In GAMEHACK every address is fake and local. Outside, you need a written rules-of-engagement. When in doubt, do not scan.",
-          el: "Η αποστολή πακέτων σε σύστημα που δεν σου ανήκει μπορεί να είναι παράνομη. Στο GAMEHACK όλες οι διευθύνσεις είναι ψεύτικες.",
+          el: "Η αποστολή πακέτων σε σύστημα που δεν σου ανήκει μπορεί να είναι παράνομη. Στο Gamehack οι διευθύνσεις είναι φανταστικές και περιορισμένες στην προσομοίωση. Εκτός εργαστηρίου, χρειάζεσαι γραπτή άδεια και σαφή όρια ελέγχου. Αν έχεις αμφιβολία, μην κάνεις σάρωση.",
         },
       },
     ],
@@ -381,35 +381,35 @@ export const MODULES: Module[] = [
     tasks: [
       {
         id: "ip",
-        instruction: { en: "Show your interface with ip addr (or ifconfig).", el: "Δείξε τη διεπαφή με ip addr." },
+        instruction: { en: "Show your interface with ip addr (or ifconfig).", el: "Εμφάνισε τις δικτυακές διεπαφές με ip addr (ή ifconfig)." },
         hint: { en: "ip addr", el: "ip addr" },
-        explain: { en: "WHY: Know your own IP before you scan others.", el: "ΓΙΑΤΙ: Ξέρε τη IP σου πριν σαρώσεις." },
+        explain: { en: "WHY: Know your own IP before you scan others.", el: "ΓΙΑΤΙ: Μάθε πρώτα τη δική σου διεύθυνση IP, πριν σαρώσεις άλλους host." },
         check: (t) => t.flags.has("ip") || usedCmd(t, /\b(ip|ifconfig)\b/),
       },
       {
         id: "ping",
-        instruction: { en: "Ping raven.lab or 10.10.10.5.", el: "Κάνε ping το raven.lab ή 10.10.10.5." },
+        instruction: { en: "Ping raven.lab or 10.10.10.5.", el: "Κάνε ping στο raven.lab ή στη διεύθυνση 10.10.10.5." },
         hint: { en: "ping 10.10.10.5", el: "ping 10.10.10.5" },
-        explain: { en: "WHY: Host discovery 101.", el: "ΓΙΑΤΙ: Ανακάλυψη hosts." },
+        explain: { en: "WHY: Host discovery 101.", el: "ΓΙΑΤΙ: Έτσι ελέγχεις αν ένας host είναι προσβάσιμος." },
         check: (t) => t.flags.has("ping") || usedCmd(t, /^\s*ping\b/),
       },
       {
         id: "hosts",
         instruction: { en: "Read /etc/hosts to map names to IPs.", el: "Διάβασε /etc/hosts." },
         hint: { en: "cat /etc/hosts", el: "cat /etc/hosts" },
-        explain: { en: "WHY: Names beat remembering octets.", el: "ΓΙΑΤΙ: Τα ονόματα είναι καλύτερα από οκτάδες." },
+        explain: { en: "WHY: Names beat remembering octets.", el: "ΓΙΑΤΙ: Τα ονόματα απομνημονεύονται πιο εύκολα από τις διευθύνσεις IP." },
         check: (t) => t.flags.has("read-hosts"),
       },
     ],
     challenges: [
       {
-        title: { en: "Touch the web box", el: "Άγγιξε το web" },
+        title: { en: "Touch the web box", el: "Έλεγχος του web server" },
         brief: { en: "Ping 10.10.10.8 (web.lab) as well.", el: "Κάνε ping το 10.10.10.8." },
-        success: { en: "Two hosts alive on the forge net.", el: "Δύο hosts ζωντανοί." },
+        success: { en: "Two hosts alive on the forge net.", el: "Βρήκες δύο ενεργούς host στο δίκτυο του εργαστηρίου." },
         check: (t) => usedCmd(t, /ping\s+.*(10\.10\.10\.8|web\.lab)/),
       },
       {
-        title: { en: "Know thyself", el: "Γνώθι σαυτόν" },
+        title: { en: "Know thyself", el: "Μάθε σε ποιο μηχάνημα βρίσκεσαι" },
         brief: { en: "Run hostname so you remember which box you are on.", el: "Τρέξε hostname." },
         success: { en: "You are kali. Don't lose the plot.", el: "Είσαι kali." },
         check: (t) => usedCmd(t, /^\s*hostname\b/),
@@ -422,22 +422,22 @@ export const MODULES: Module[] = [
     icon: "radar",
     color: "from-emerald-400 to-teal-800",
     difficulty: 3,
-    title: { en: "Reconnaissance", el: "Αναγνώριση" },
-    subtitle: { en: "Sweep the subnet. Find what is alive.", el: "Σάρωσε το subnet. Βρες τι ζει." },
-    badge: { en: "Recon Scout", el: "Κατάσκοπος recon" },
+    title: { en: "Reconnaissance", el: "Αναγνώριση δικτύου" },
+    subtitle: { en: "Sweep the subnet. Find what is alive.", el: "Σάρωσε το υποδίκτυο και εντόπισε τους ενεργούς host." },
+    badge: { en: "Recon Scout", el: "Ανιχνευτής στόχων" },
     theory: [
       {
         heading: { en: "Active vs passive recon", el: "Ενεργητική vs παθητική recon" },
         body: {
           en: "Passive recon uses public data (DNS, whois, search engines) and does not touch the target. Active recon sends packets (ping sweeps, nmap). This lab teaches active recon against simulated hosts only.",
-          el: "Η παθητική recon χρησιμοποιεί δημόσια δεδομένα. Η ενεργητική στέλνει πακέτα. Εδώ μόνο προσομοιωμένοι στόχοι.",
+          el: "Η παθητική αναγνώριση βασίζεται σε δημόσια δεδομένα (DNS, whois, μηχανές αναζήτησης) χωρίς να επικοινωνεί με τον στόχο. Η ενεργητική αναγνώριση στέλνει πακέτα, π.χ. με ping ή nmap. Σε αυτό το εργαστήριο, οι στόχοι είναι αποκλειστικά προσομοιωμένοι.",
         },
       },
       {
         heading: { en: "Network sweeps with nmap", el: "Σαρώσεις με nmap" },
         body: {
           en: "nmap 10.10.10.0/24 asks every address in the /24 if it is up. On a /24 that is 256 hosts. Use this to build your target list before you port-scan a single machine.",
-          el: "Το nmap 10.10.10.0/24 ρωτά κάθε διεύθυνση αν είναι ζωντανή. Χτίσε λίστα στόχων πριν σαρώσεις θύρες.",
+          el: "Η εντολή nmap 10.10.10.0/24 ελέγχει αν απαντά κάποια από τις διευθύνσεις του υποδικτύου — έως και 256 host. Χρησιμοποίησέ την για να εντοπίσεις τους ενεργούς στόχους πριν σαρώσεις τις θύρες τους.",
         },
         tip: {
           en: "Never sweep a network that is not in your written scope.",
@@ -467,15 +467,15 @@ export const MODULES: Module[] = [
     ],
     challenges: [
       {
-        title: { en: "Name the four", el: "Ονόμασε τους τέσσερις" },
+        title: { en: "Name the four", el: "Βρες τους τέσσερις host" },
         brief: { en: "After the sweep, read tools/targets.txt and confirm the four lab hosts.", el: "Διάβασε tools/targets.txt." },
         success: { en: "Target list confirmed.", el: "Η λίστα στόχων επιβεβαιώθηκε." },
         check: (t) => t.filesRead.some((p) => p.includes("targets.txt")) || usedCmd(t, /cat\s+.*targets/),
       },
       {
-        title: { en: "Web box ports", el: "Θύρες του web" },
+        title: { en: "Web box ports", el: "Ανοιχτές θύρες του web server" },
         brief: { en: "Port-scan 10.10.10.8.", el: "Σάρωσε θύρες στο 10.10.10.8." },
-        success: { en: "web.lab fingerprint started.", el: "Το fingerprint του web.lab ξεκίνησε." },
+        success: { en: "web.lab fingerprint started.", el: "Ξεκίνησε η αναγνώριση των υπηρεσιών του web.lab." },
         check: (t) => t.flags.has("nmap-web") || usedCmd(t, /nmap\s+.*10\.10\.10\.8/),
       },
     ],
@@ -487,14 +487,14 @@ export const MODULES: Module[] = [
     color: "from-sky-400 to-indigo-800",
     difficulty: 3,
     title: { en: "Service Scanning", el: "Σάρωση υπηρεσιών" },
-    subtitle: { en: "Versions, banners, and what they imply", el: "Εκδόσεις, banners και τι σημαίνουν" },
+    subtitle: { en: "Versions, banners, and what they imply", el: "Εκδόσεις, banners και τι αποκαλύπτουν" },
     badge: { en: "Port Mapper", el: "Χαρτογράφος θυρών" },
     theory: [
       {
         heading: { en: "Why versions matter", el: "Γιατί μετράνε οι εκδόσεις" },
         body: {
           en: "An open port is a door. The version behind it tells you which key might fit. nmap -sV probes services for banners (OpenSSH 8.4, Apache 2.4, …). You then research known weaknesses — in scope, in a lab, never in the wild without permission.",
-          el: "Μια ανοιχτή θύρα είναι πόρτα. Η έκδοση λέει ποιο κλειδί ίσως ταιριάζει. Το nmap -sV διαβάζει banners.",
+          el: "Μια ανοιχτή θύρα δείχνει ότι κάποια υπηρεσία είναι διαθέσιμη. Η έκδοσή της βοηθά να καταλάβεις τι λογισμικό εκτελείται. Η nmap -sV ελέγχει τις υπηρεσίες και διαβάζει τα banners τους· στη συνέχεια, μπορείς να ερευνήσεις γνωστά αδύνατα σημεία — πάντα εντός των συμφωνημένων ορίων και με άδεια.",
         },
       },
     ],
@@ -520,13 +520,13 @@ export const MODULES: Module[] = [
     ],
     challenges: [
       {
-        title: { en: "Raven's HTTP", el: "Το HTTP του Raven" },
+        title: { en: "Raven's HTTP", el: "HTTP στο Raven" },
         brief: { en: "curl http://10.10.10.5/ and note the CMS name.", el: "curl http://10.10.10.5/" },
         success: { en: "Raven CMS spotted.", el: "Εντοπίστηκε Raven CMS." },
         check: (t) => t.flags.has("curl-raven") || usedCmd(t, /curl\s+.*10\.10\.10\.5/),
       },
       {
-        title: { en: "SSH on the jump", el: "SSH στο jump" },
+        title: { en: "SSH on the jump", el: "SSH μέσω του jump host" },
         brief: { en: "Version-scan 10.10.10.12 (ssh.lab).", el: "Σάρωσε το 10.10.10.12." },
         success: { en: "OpenSSH banner captured.", el: "Banner OpenSSH." },
         check: (t) => t.flags.has("nmap-ssh") || usedCmd(t, /nmap\s+.*10\.10\.10\.12/),
@@ -539,15 +539,15 @@ export const MODULES: Module[] = [
     icon: "hammer",
     color: "from-rose-500 to-red-800",
     difficulty: 3,
-    title: { en: "Credential Attacks (Lab)", el: "Επιθέσεις διαπιστευτηρίων (Lab)" },
-    subtitle: { en: "Dictionary attacks against a simulated SSH", el: "Επιθέσεις λεξικού σε προσομοιωμένο SSH" },
-    badge: { en: "Lock Breaker", el: "Κλειδοσπάστης" },
+    title: { en: "Credential Attacks (Lab)", el: "Επιθέσεις σε διαπιστευτήρια (εργαστήριο)" },
+    subtitle: { en: "Dictionary attacks against a simulated SSH", el: "Επιθέσεις με λίστα κωδικών σε προσομοιωμένο SSH" },
+    badge: { en: "Lock Breaker", el: "Ερευνητής κωδικών" },
     theory: [
       {
         heading: { en: "What brute force is — and is not", el: "Τι είναι (και δεν είναι) το brute force" },
         body: {
           en: "A dictionary attack tries likely passwords from a list. It is noisy, slow, and illegal against systems you do not own. We simulate hydra against ssh.lab so you understand the pattern: service + username + wordlist. Defenders rate-limit, lock accounts, and require keys for a reason.",
-          el: "Μια επίθεση λεξικού δοκιμάζει πιθανούς κωδικούς. Είναι θορυβώδης και παράνομη εκτός εξουσιοδότησης. Εδώ είναι προσομοίωση.",
+          el: "Σε μια επίθεση λεξικού δοκιμάζονται πιθανοί κωδικοί από μια λίστα. Η διαδικασία είναι εύκολα ανιχνεύσιμη και παράνομη χωρίς άδεια. Εδώ προσομοιώνουμε τη χρήση της hydra στο ssh.lab, ώστε να καταλάβεις τη λογική: υπηρεσία, όνομα χρήστη και λίστα λέξεων. Οι άμυνες περιλαμβάνουν περιορισμό προσπαθειών, κλείδωμα λογαριασμών και χρήση κλειδιών.",
         },
         tip: {
           en: "Real takeaway: disable password SSH, use keys, enable 2FA, and alert on hydra-like traffic.",
@@ -602,15 +602,15 @@ export const MODULES: Module[] = [
     icon: "database",
     color: "from-yellow-400 to-orange-700",
     difficulty: 4,
-    title: { en: "SQL Injection (Lab)", el: "SQL Injection (Lab)" },
-    subtitle: { en: "Detect and extract — simulated only", el: "Ανίχνευση και εξαγωγή — μόνο προσομοίωση" },
-    badge: { en: "Query Bender", el: "Λυγιστής ερωτημάτων" },
+    title: { en: "SQL Injection (Lab)", el: "Έγχυση SQL (εργαστήριο)" },
+    subtitle: { en: "Detect and extract — simulated only", el: "Εντόπισε και εξήγαγε δεδομένα — μόνο σε προσομοίωση" },
+    badge: { en: "Query Bender", el: "Ερευνητής SQL" },
     theory: [
       {
         heading: { en: "The idea, not a weapon", el: "Η ιδέα, όχι όπλο" },
         body: {
           en: "SQL injection happens when untrusted input is concatenated into a query. Classic test: a single quote that breaks syntax. In this lab, curl a simulated login with an id= parameter. We do not teach bypassing real WAF/production DBs. Defenders: use parameterised queries, ORMs, and least-privilege DB users.",
-          el: "Το SQLi συμβαίνει όταν μη έμπιστη είσοδος μπαίνει σε ερώτημα. Υπερασπιστές: parameterized queries.",
+          el: "Το SQL injection συμβαίνει όταν η εφαρμογή ενσωματώνει μη έμπιστη είσοδο απευθείας σε ένα ερώτημα. Ένα απλό τεστ είναι ένα απόστροφο που προκαλεί συντακτικό σφάλμα. Στο εργαστήριο, δοκίμασε το curl σε μια προσομοιωμένη σελίδα σύνδεσης με παράμετρο id=. Για προστασία, χρησιμοποίησε παραμετροποιημένα ερωτήματα, ORM και λογαριασμούς βάσης με περιορισμένα δικαιώματα.",
         },
       },
     ],
@@ -636,15 +636,15 @@ export const MODULES: Module[] = [
     ],
     challenges: [
       {
-        title: { en: "Union extract", el: "Εξαγωγή UNION" },
+        title: { en: "Union extract", el: "Εξαγωγή δεδομένων με UNION" },
         brief: { en: "Trigger the simulated UNION path (quote + or/union in the id param) or finish sqlmap.", el: "Πυροδότησε το προσομοιωμένο UNION." },
         success: { en: "You extracted a lab flag from a fake database.", el: "Έβγαλες flag από ψεύτικη βάση." },
         check: (t) => t.flags.has("sqli-win") || t.flags.has("saw:FLAG{sqli_union_selected}"),
       },
       {
-        title: { en: "Submit the flag", el: "Υπέβαλε τη σημαία" },
+        title: { en: "Submit the flag", el: "Υπέβαλε το flag" },
         brief: { en: "submit FLAG{sqli_union_selected}", el: "submit FLAG{sqli_union_selected}" },
-        success: { en: "Query bent. Parameterise your SQL in real apps.", el: "Λύγισες το ερώτημα. Στις πραγματικές εφαρμογές: parameterized SQL." },
+        success: { en: "Query bent. Parameterise your SQL in real apps.", el: "Το ερώτημα λύγισε. Στις πραγματικές εφαρμογές, χρησιμοποίησε παραμετροποιημένα SQL ερωτήματα." },
         check: (t) => t.flags.has("submit:FLAG{sqli_union_selected}") || t.flags.has("sqli-win"),
       },
     ],
@@ -655,15 +655,15 @@ export const MODULES: Module[] = [
     icon: "crown",
     color: "from-amber-300 to-ember-700",
     difficulty: 5,
-    title: { en: "Privilege Escalation", el: "Ανύψωση προνομίων" },
-    subtitle: { en: "sudo -l, GTFOBins, and getting root in the sandbox", el: "sudo -l, GTFOBins και root στο sandbox" },
-    badge: { en: "Root Forged", el: "Root σφυρηλατημένο" },
+    title: { en: "Privilege Escalation", el: "Κλιμάκωση προνομίων" },
+    subtitle: { en: "sudo -l, GTFOBins, and getting root in the sandbox", el: "sudo -l, GTFOBins και πρόσβαση root σε προσομοίωση" },
+    badge: { en: "Root Forged", el: "Πρόσβαση root" },
     theory: [
       {
         heading: { en: "From user to root", el: "Από χρήστη σε root" },
         body: {
           en: "Privilege escalation is what you do after a foothold: look for sudo rights, SUID binaries, writable cron, kernel bugs. In this lab, sudo -l reveals that find can run as root — a well-known GTFOBins path. Understanding it makes you a better defender (remove those rights).",
-          el: "Η ανύψωση προνομίων γίνεται μετά το foothold: sudo, SUID, cron. Εδώ το find επιτρέπεται ως root.",
+          el: "Μετά την αρχική πρόσβαση, η κλιμάκωση προνομίων αναζητά αδυναμίες όπως υπερβολικά δικαιώματα sudo, SUID binaries, τροποποιήσιμες εργασίες cron ή ευπάθειες του πυρήνα. Εδώ η sudo -l δείχνει ότι η find μπορεί να εκτελεστεί ως root — ένα γνωστό μοτίβο του GTFOBins. Οι αμυνόμενοι πρέπει να αφαιρούν τέτοια δικαιώματα.",
         },
       },
     ],
@@ -681,7 +681,7 @@ export const MODULES: Module[] = [
       },
       {
         id: "root",
-        instruction: { en: "Escalate using sudo find (see cheatsheet).", el: "Ανύψωσε με sudo find." },
+        instruction: { en: "Escalate using sudo find (see cheatsheet).", el: "Χρησιμοποίησε το sudo find για να αποκτήσεις πρόσβαση root." },
         hint: { en: "sudo find / -name flag.txt", el: "sudo find / -name flag.txt" },
         explain: { en: "WHY: find with sudo can spawn a shell. Defenders: never sudo find.", el: "ΓΙΑΤΙ: το find με sudo μπορεί να δώσει shell." },
         check: (t) => t.flags.has("got-root") || t.flags.has("privesc-find"),
@@ -689,13 +689,13 @@ export const MODULES: Module[] = [
     ],
     challenges: [
       {
-        title: { en: "Read the root flag", el: "Διάβασε το root flag" },
+        title: { en: "Read the root flag", el: "Διάβασε το flag του root" },
         brief: { en: "As root, cat /root/flag.txt", el: "Ως root, cat /root/flag.txt" },
         success: { en: "Root of the forge. You are dangerous — stay ethical.", el: "Root του καμινιού. Μείνε ηθικός." },
         check: (t) => t.flags.has("read-root-flag") || t.flags.has("saw:FLAG{root_of_the_forge}") || t.flags.has("got-root"),
       },
       {
-        title: { en: "Submit it", el: "Υπέβαλέ το" },
+        title: { en: "Submit it", el: "Υπέβαλε το flag" },
         brief: { en: "submit FLAG{root_of_the_forge}", el: "submit FLAG{root_of_the_forge}" },
         success: { en: "Campaign I complete.", el: "Καμπάνια I ολοκληρώθηκε." },
         check: (t) => t.flags.has("submit:FLAG{root_of_the_forge}") || t.flags.has("got-root"),
@@ -708,8 +708,8 @@ export const MODULES: Module[] = [
     icon: "radar",
     color: "from-zinc-400 to-zinc-800",
     difficulty: 3,
-    title: { en: "Raven — Recon", el: "Raven — Αναγνώριση" },
-    subtitle: { en: "Enumerate the nevermore box", el: "Απαρίθμησε το nevermore" },
+    title: { en: "Raven — Recon", el: "Raven — Αναγνώριση δικτύου" },
+    subtitle: { en: "Enumerate the nevermore box", el: "Ερεύνησε το μηχάνημα nevermore" },
     badge: { en: "Raven Scout", el: "Κατάσκοπος Raven" },
     scenario: "raven",
     theory: [
@@ -717,7 +717,7 @@ export const MODULES: Module[] = [
         heading: { en: "Boot2root methodology", el: "Μεθοδολογία boot2root" },
         body: {
           en: "A boot2root machine is a legal playground: recon → foothold → enumerate → privesc → flags. Raven is inspired by classic CTF boxes. Stay inside the lab.",
-          el: "Ένα boot2root είναι νόμιμο πεδίο: recon → foothold → enumerate → privesc → flags.",
+          el: "Ένα μηχάνημα boot2root προσφέρει νόμιμο περιβάλλον εξάσκησης: αναγνώριση → αρχική πρόσβαση → απαρίθμηση → κλιμάκωση προνομίων → flags. Το Raven είναι εμπνευσμένο από κλασικά CTF μηχανήματα. Μείνε μέσα στο εργαστήριο.",
         },
       },
     ],
@@ -730,7 +730,7 @@ export const MODULES: Module[] = [
         id: "scan",
         instruction: { en: "nmap -sV 10.10.10.5", el: "nmap -sV 10.10.10.5" },
         hint: { en: "nmap -sV 10.10.10.5", el: "nmap -sV 10.10.10.5" },
-        explain: { en: "WHY: Raven speaks SSH and HTTP.", el: "ΓΙΑΤΙ: Ο Raven μιλά SSH και HTTP." },
+        explain: { en: "WHY: Raven speaks SSH and HTTP.", el: "ΓΙΑΤΙ: Το Raven δέχεται συνδέσεις μέσω SSH και HTTP." },
         check: (t) => t.flags.has("nmap-raven") || t.flags.has("nmap-sv"),
       },
       {
@@ -762,8 +762,8 @@ export const MODULES: Module[] = [
     icon: "key",
     color: "from-orange-400 to-stone-800",
     difficulty: 4,
-    title: { en: "Raven — Foothold", el: "Raven — Foothold" },
-    subtitle: { en: "Weak creds, then user.txt", el: "Αδύναμα creds, μετά user.txt" },
+    title: { en: "Raven — Foothold", el: "Raven — Αρχική πρόσβαση" },
+    subtitle: { en: "Weak creds, then user.txt", el: "Αδύναμοι κωδικοί και το user.txt" },
     badge: { en: "Nevermore", el: "Nevermore" },
     scenario: "raven",
     theory: [
@@ -816,16 +816,16 @@ export const MODULES: Module[] = [
     icon: "globe",
     color: "from-cyan-400 to-slate-800",
     difficulty: 4,
-    title: { en: "Raven — Web & Loot", el: "Raven — Web & λάφυρα" },
-    subtitle: { en: "Config files and SQL backups", el: "Config και SQL backups" },
-    badge: { en: "Looter", el: "Λαφυραγωγός" },
+    title: { en: "Raven — Web & Loot", el: "Raven — Web και αρχεία" },
+    subtitle: { en: "Config files and SQL backups", el: "Αρχεία ρυθμίσεων και αντίγραφα SQL" },
+    badge: { en: "Looter", el: "Συλλέκτης στοιχείων" },
     scenario: "raven",
     theory: [
       {
         heading: { en: "Post-foothold loot", el: "Λάφυρα μετά το foothold" },
         body: {
           en: "Once you have a shell, read configs. /var/www/html/config.php and /var/backups/cms.sql are realistic leftovers. They are how real breaches cascade.",
-          el: "Με shell, διάβασε configs. Τα leftovers είναι ο τρόπος που επεκτείνονται οι παραβιάσεις.",
+          el: "Μόλις αποκτήσεις πρόσβαση σε shell, εξέτασε τα αρχεία ρυθμίσεων. Αρχεία όπως τα /var/www/html/config.php και /var/backups/cms.sql συχνά αποκαλύπτουν στοιχεία που επιτρέπουν σε μια παραβίαση να επεκταθεί.",
         },
       },
     ],
@@ -851,13 +851,13 @@ export const MODULES: Module[] = [
     ],
     challenges: [
       {
-        title: { en: "Web flag", el: "Web flag" },
-        brief: { en: "Submit the flag from the SQL dump.", el: "Υπέβαλε το flag από το dump." },
+        title: { en: "Web flag", el: "Flag του διακομιστή ιστού" },
+        brief: { en: "Submit the flag from the SQL dump.", el: "Υπέβαλε το flag που βρήκες στο SQL dump." },
         success: { en: "Database looted.", el: "Η βάση λεηλατήθηκε." },
         check: (t) => t.flags.has("read-sql") || t.flags.has("saw:FLAG{raven_web_dump}") || t.flags.has("submit:FLAG{raven_web_dump}"),
       },
       {
-        title: { en: "Cron clue", el: "Ίχνος cron" },
+        title: { en: "Cron clue", el: "Ίχνη στο cron" },
         brief: { en: "cat /etc/crontab — privilege lives in scheduled jobs.", el: "cat /etc/crontab" },
         success: { en: "backup.sh runs as root. That's your ladder.", el: "Το backup.sh τρέχει ως root." },
         check: (t) => t.flags.has("read-cron") || usedCmd(t, /crontab/),
@@ -870,16 +870,16 @@ export const MODULES: Module[] = [
     icon: "crown",
     color: "from-yellow-300 to-red-800",
     difficulty: 5,
-    title: { en: "Raven — Root", el: "Raven — Root" },
-    subtitle: { en: "Writable cron script to root.txt", el: "εγγράψιμο cron ως root.txt" },
-    badge: { en: "Raven Rooted", el: "Raven rooted" },
+    title: { en: "Raven — Root", el: "Raven — Πρόσβαση root" },
+    subtitle: { en: "Writable cron script to root.txt", el: "Τροποποίηση script cron και πρόσβαση στο root.txt" },
+    badge: { en: "Raven Rooted", el: "Πρόσβαση root στο Raven" },
     scenario: "raven",
     theory: [
       {
         heading: { en: "Writable scripts run by root", el: "Εγγράψιμα script που τρέχει ο root" },
         body: {
           en: "If root runs a script that world-writable users can edit, they can insert a payload. Here, nano /usr/local/bin/backup.sh then sudo that script. Defenders: lock down permissions, don't run user-writable jobs as root.",
-          el: "Αν ο root τρέχει εγγράψιμο script, κάποιος μπορεί να βάλει payload. Υπερασπιστές: κλειδώστε δικαιώματα.",
+          el: "Αν ο root εκτελεί ένα script που μπορούν να τροποποιήσουν άλλοι χρήστες, εκείνοι μπορούν να προσθέσουν δικές τους εντολές. Στο εργαστήριο, άνοιξε το /usr/local/bin/backup.sh με nano και δες πώς επηρεάζει η εκτέλεσή του. Για προστασία, περιόρισε τα δικαιώματα και μην εκτελείς ως root εργασίες που μπορούν να αλλάξουν απλοί χρήστες.",
         },
       },
     ],
@@ -919,7 +919,7 @@ export const MODULES: Module[] = [
         check: (t) => t.flags.has("read-root-flag") || t.flags.has("got-root"),
       },
       {
-        title: { en: "Submit nevermore", el: "Υπέβαλε nevermore" },
+        title: { en: "Submit nevermore", el: "Υπέβαλε το flag nevermore" },
         brief: { en: "submit FLAG{raven_rooted_the_nevermore}", el: "submit FLAG{raven_rooted_the_nevermore}" },
         success: { en: "Box rooted. Hang the badge on the wall.", el: "Το κουτί rooted." },
         check: (t) => t.flags.has("submit:FLAG{raven_rooted_the_nevermore}") || t.flags.has("got-root"),
@@ -932,16 +932,16 @@ export const MODULES: Module[] = [
     icon: "key",
     color: "from-lime-400 to-emerald-900",
     difficulty: 2,
-    title: { en: "SSH Keys & Config", el: "Κλειδιά SSH & config" },
-    subtitle: { en: "Identity files, config stanzas, ssh -i", el: "Identity files και ssh -i" },
-    badge: { en: "Keybearer", el: "Κλειδοκράτορας" },
+    title: { en: "SSH Keys & Config", el: "Κλειδιά SSH και ρυθμίσεις" },
+    subtitle: { en: "Identity files, config stanzas, ssh -i", el: "Αρχεία κλειδιών, ρυθμίσεις σύνδεσης και ssh -i" },
+    badge: { en: "Keybearer", el: "Κάτοχος κλειδιών" },
     scenario: "ssh",
     theory: [
       {
         heading: { en: "Keys beat passwords", el: "Τα κλειδιά νικούν τους κωδικούς" },
         body: {
           en: "SSH public-key auth uses a private key (id_ed25519) kept at 600 permissions. ~/.ssh/config maps Host aliases. ssh -i file user@host selects a key. Never share private keys — in this lab they are fake.",
-          el: "Η πιστοποίηση με κλειδί SSH χρησιμοποιεί ιδιωτικό κλειδί. Ποτέ μην μοιράζεσαι ιδιωτικά κλειδιά.",
+          el: "Η πιστοποίηση SSH με δημόσιο κλειδί βασίζεται σε ένα ιδιωτικό κλειδί (π.χ. id_ed25519), το οποίο πρέπει να έχει δικαιώματα 600. Το ~/.ssh/config αντιστοιχίζει ονόματα host σε ρυθμίσεις σύνδεσης, ενώ η επιλογή ssh -i ορίζει ποιο κλειδί θα χρησιμοποιηθεί. Μην κοινοποιείς ποτέ ιδιωτικά κλειδιά — στο εργαστήριο είναι φανταστικά.",
         },
       },
     ],
@@ -994,16 +994,16 @@ export const MODULES: Module[] = [
     icon: "git",
     color: "from-teal-400 to-cyan-900",
     difficulty: 3,
-    title: { en: "ProxyJump & Hopping", el: "ProxyJump & hopping" },
-    subtitle: { en: "Bastion → dev with -J", el: "Bastion → dev με -J" },
-    badge: { en: "Wirewalker", el: "Πεζοπόρος καλωδίων" },
+    title: { en: "ProxyJump & Hopping", el: "ProxyJump και σύνδεση μέσω ενδιάμεσου host" },
+    subtitle: { en: "Bastion → dev with -J", el: "Από το bastion στο dev με -J" },
+    badge: { en: "Wirewalker", el: "Ιχνηλάτης δικτύου" },
     scenario: "ssh",
     theory: [
       {
         heading: { en: "Jump hosts", el: "Jump hosts" },
         body: {
           en: "Internal boxes often accept SSH only from a bastion. ssh -J jump dev@10.10.20.14 (ProxyJump) chains the sessions. This is how real corporate networks are segmented — and how attackers pivot, which is why bastions need MFA, monitoring, and no outbound-any.",
-          el: "Τα εσωτερικά μηχανήματα δέχονται SSH μόνο από bastion. Το ProxyJump αλυσιδώνει συνεδρίες.",
+          el: "Συχνά, τα εσωτερικά μηχανήματα δέχονται συνδέσεις SSH μόνο μέσω ενός bastion. Η εντολή ssh -J jump dev@10.10.20.14 (ProxyJump) περνά τη σύνδεση μέσω του ενδιάμεσου host. Στα πραγματικά δίκτυα, οι bastion hosts χρειάζονται MFA και παρακολούθηση· πρέπει επίσης να περιορίζονται οι εξερχόμενες συνδέσεις.",
         },
       },
     ],
@@ -1041,16 +1041,16 @@ export const MODULES: Module[] = [
     icon: "share",
     color: "from-fuchsia-400 to-purple-900",
     difficulty: 4,
-    title: { en: "Pivots & Internal DB", el: "Pivots & εσωτερική DB" },
-    subtitle: { en: "Reach db-int from dev", el: "Φτάσε db-int από dev" },
-    badge: { en: "Deep Pivot", el: "Βαθύ pivot" },
+    title: { en: "Pivots & Internal DB", el: "Pivoting και εσωτερική βάση δεδομένων" },
+    subtitle: { en: "Reach db-int from dev", el: "Συνδέσου στο db-int από το dev" },
+    badge: { en: "Deep Pivot", el: "Εσωτερικό pivot" },
     scenario: "ssh",
     theory: [
       {
         heading: { en: "Segmentation", el: "Τμηματοποίηση" },
         body: {
           en: "db-int.lab (10.10.20.30) is not reachable from kali — only from dev. That is network segmentation. After hopping to dev, ssh to the DB. Local port forwards (ssh -L) would do the same in production. Monitor east-west SSH.",
-          el: "Το db-int δεν φαίνεται από kali — μόνο από dev. Αυτό είναι segmentation.",
+          el: "Το db-int.lab (10.10.20.30) δεν είναι προσβάσιμο από το kali· μπορείς να συνδεθείς μόνο από το dev. Αυτό είναι τμηματοποίηση δικτύου. Συνδέσου πρώτα στο dev και από εκεί στη βάση. Σε πραγματικά δίκτυα, παρακολούθησε τις συνδέσεις SSH μεταξύ εσωτερικών συστημάτων.",
         },
       },
     ],
@@ -1070,19 +1070,19 @@ export const MODULES: Module[] = [
         id: "db",
         instruction: { en: "From that context, ssh to 10.10.20.30 or db-int.", el: "ssh στο 10.10.20.30" },
         hint: { en: "ssh 10.10.20.30", el: "ssh 10.10.20.30" },
-        explain: { en: "WHY: Dual-homed hosts are pivots.", el: "ΓΙΑΤΙ: Dual-homed hosts = pivots." },
+        explain: { en: "WHY: Dual-homed hosts are pivots.", el: "ΓΙΑΤΙ: Τα συστήματα με δύο δικτυακές διεπαφές μπορούν να λειτουργήσουν ως ενδιάμεσοι σταθμοί." },
         check: (t) => t.flags.has("ssh-db"),
       },
     ],
     challenges: [
       {
-        title: { en: "Deep flag", el: "Βαθύ flag" },
+        title: { en: "Deep flag", el: "Το flag στο εσωτερικό δίκτυο" },
         brief: { en: "Reach db-int and capture FLAG{ssh_deep_pivot}.", el: "Φτάσε db-int." },
         success: { en: "You walked the wire.", el: "Περπάτησες το καλώδιο." },
         check: (t) => t.flags.has("ssh-db") || t.flags.has("saw:FLAG{ssh_deep_pivot}"),
       },
       {
-        title: { en: "Tunnel souvenir", el: "Σουβενίρ τούνελ" },
+        title: { en: "Tunnel souvenir", el: "Flag μέσω SSH tunnel" },
         brief: { en: "cat /opt/tunnel.flag on kali.", el: "cat /opt/tunnel.flag" },
         success: { en: "Local forward imagined.", el: "Το local forward φαντάστηκες." },
         check: (t) => t.filesRead.some((p) => p.includes("tunnel.flag")) || t.flags.has("ssh-db"),
@@ -1101,7 +1101,7 @@ export const CAMPAIGNS: Campaign[] = ([
     id: "forge",
     pathNumber: 1,
     title: { en: "In the Beginning... Linux Was Born", el: "Στην αρχή... γεννήθηκε το Linux" },
-    subtitle: { en: "Linux foundations: from your first command to root", el: "Θεμέλια Linux: από την πρώτη εντολή ως το root" },
+    subtitle: { en: "Linux foundations: from your first command to root", el: "Βασικές αρχές Linux: από την πρώτη εντολή μέχρι την πρόσβαση root" },
     blurb: {
       en: "Nine sequenced labs from first prompt to root. Linux, recon, scanning, credentials, SQLi, privesc — all simulated.",
       el: "Εννέα εργαστήρια από το πρώτο prompt ως το root. Όλα προσομοιωμένα.",
@@ -1116,7 +1116,7 @@ export const CAMPAIGNS: Campaign[] = ([
     id: "raven",
     pathNumber: 6,
     title: { en: "Operation Raven", el: "Επιχείρηση Raven" },
-    subtitle: { en: "A boot2root CTF box", el: "Ένα κουτί boot2root CTF" },
+    subtitle: { en: "A boot2root CTF box", el: "Ένα μηχάνημα CTF τύπου boot2root" },
     blurb: {
       en: "Recon, foothold, loot the CMS, ride a writable cron to root. Four flags. One nevermore.",
       el: "Recon, foothold, CMS, cron ως root. Τέσσερις σημαίες.",
@@ -1129,7 +1129,7 @@ export const CAMPAIGNS: Campaign[] = ([
     id: "wirewalk",
     pathNumber: 5,
     title: { en: "Wirewalk", el: "Wirewalk" },
-    subtitle: { en: "SSH labyrinth", el: "Λαβύρινθος SSH" },
+    subtitle: { en: "SSH labyrinth", el: "Ο λαβύρινθος του SSH" },
     blurb: {
       en: "Keys, bastions, ProxyJump and an internal database you cannot see from kali.",
       el: "Κλειδιά, bastions, ProxyJump και εσωτερική βάση αόρατη από kali.",
@@ -1145,7 +1145,7 @@ export const CAMPAIGNS: Campaign[] = ([
     subtitle: { en: "Linux for Beginners", el: "Linux για αρχάριους" },
     blurb: {
       en: "Foundational Sudo_Run labs from pwd onward, followed by dedicated sequels for networking, processes, Bash automation and services. Everything runs in a safe, persistent virtual filesystem.",
-      el: "Βασικά labs Sudo_Run από το pwd και μετά, με ξεχωριστές συνέχειες για δίκτυα, διεργασίες, αυτοματοποίηση Bash και υπηρεσίες. Όλα εκτελούνται σε ασφαλές, μόνιμο εικονικό σύστημα αρχείων.",
+      el: "Ξεκίνα με τα βασικά εργαστήρια Sudo_Run και συνέχισε με ενότητες για δίκτυα, διεργασίες, αυτοματοποίηση Bash και υπηρεσίες. Όλα εκτελούνται σε ασφαλές, εικονικό σύστημα αρχείων που διατηρεί την πρόοδό σου.",
     },
     scenario: "sudorun",
     accent: "lime",
@@ -1159,11 +1159,11 @@ export const CAMPAIGNS: Campaign[] = ([
     title: { en: "Linux for Beginners #2", el: "Linux για αρχάριους #2" },
     subtitle: {
       en: "Networks, processes, scheduling and the shell environment",
-      el: "Δίκτυα, διεργασίες, προγραμματισμός και περιβάλλον shell",
+      el: "Δίκτυα, διεργασίες, προγραμματισμένες εργασίες και μεταβλητές shell",
     },
     blurb: {
       en: "Read and configure fictional interfaces, resolve lab names, inspect and signal processes, schedule safe simulated jobs, and manage shell variables without touching the host system.",
-      el: "Έλεγξε εικονικές διεπαφές, επίλυσε ονόματα του εργαστηρίου, παρατήρησε διεργασίες, δοκίμασε προγραμματισμένες εργασίες και διαχειρίσου μεταβλητές shell χωρίς να επηρεάσεις το πραγματικό σύστημα.",
+      el: "Εξέτασε και ρύθμισε εικονικές διεπαφές, αντιστοίχισε ονόματα του εργαστηρίου, παρακολούθησε διεργασίες, δοκίμασε προγραμματισμένες εργασίες και διαχειρίσου μεταβλητές shell — όλα χωρίς να επηρεάζεται το πραγματικό σύστημα.",
     },
     scenario: "sudorun",
     accent: "cyan",
@@ -1175,11 +1175,11 @@ export const CAMPAIGNS: Campaign[] = ([
     title: { en: "Linux for Beginners #3", el: "Linux για αρχάριους #3" },
     subtitle: {
       en: "Bash scripting, cron, boot services, Apache, SSH and FTP",
-      el: "Bash scripting, cron, υπηρεσίες εκκίνησης, Apache, SSH και FTP",
+      el: "Bash scripts, cron, υπηρεσίες εκκίνησης, Apache, SSH και FTP",
     },
     blurb: {
       en: "Continue the Linux series with readable Bash scripts, a fixture-only Nmap pipeline, recurring schedules, SysV boot links, and safe simulations of Apache, OpenSSH and FTP. Every file and service stays in the player’s persistent VFS.",
-      el: "Συνέχισε τη σειρά Linux με κατανοητά Bash scripts, εικονικό pipeline Nmap, επαναλαμβανόμενα προγράμματα, SysV συνδέσμους εκκίνησης και ασφαλείς προσομοιώσεις Apache, OpenSSH και FTP. Όλα τα αρχεία και οι υπηρεσίες μένουν στο μόνιμο VFS του παίκτη.",
+      el: "Συνέχισε την εκπαίδευσή σου στο Linux με ευανάγνωστα Bash scripts, ένα προσομοιωμένο pipeline του Nmap, προγραμματισμένες εργασίες και συνδέσμους εκκίνησης SysV. Θα εξασκηθείς επίσης με ασφαλείς προσομοιώσεις Apache, OpenSSH και FTP. Όλα τα αρχεία και οι υπηρεσίες παραμένουν στο εικονικό σύστημα αρχείων σου.",
     },
     scenario: "sudorun",
     accent: "lime",
@@ -1188,11 +1188,11 @@ export const CAMPAIGNS: Campaign[] = ([
   {
     id: "dfir-fieldwork",
     pathNumber: 7,
-    title: { en: "DFIR Fieldwork", el: "Επιτόπια Ψηφιακή Εγκληματολογία" },
-    subtitle: { en: "Digital Forensics & Incident Response", el: "Digital Forensics & Incident Response" },
+    title: { en: "DFIR Fieldwork", el: "Πρακτική ψηφιακή εγκληματολογία" },
+    subtitle: { en: "Digital Forensics & Incident Response", el: "Ψηφιακή εγκληματολογία και απόκριση σε περιστατικά" },
     blurb: {
       en: "Ten linked forensic labs: evidence handling, Windows artifacts, document analysis, web and network forensics, disk, malware, memory, containers, and password hashes. Every artifact is a safe, fictional local fixture.",
-      el: "Δέκα συνδεδεμένα labs: διατήρηση τεκμηρίων, Windows artifacts, έγγραφα, web/network, disk, malware, memory, containers και password hashes. Όλα τα τεκμήρια είναι ασφαλή, φανταστικά τοπικά fixtures.",
+      el: "Δέκα συνδεδεμένα εργαστήρια ψηφιακής εγκληματολογίας: διαχείριση τεκμηρίων, αρχεία Windows, έγγραφα, web και δίκτυα, δίσκοι, κακόβουλο λογισμικό, μνήμη, containers και hashes κωδικών. Όλα τα δεδομένα είναι φανταστικά και εκτελούνται τοπικά με ασφάλεια.",
     },
     scenario: "dfir",
     accent: "cyan",

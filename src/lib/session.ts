@@ -35,7 +35,7 @@ export async function issueSession(userId: string) {
   (await cookies()).set(COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.APP_ORIGIN?.startsWith("https://") ?? false,
+    secure: process.env.NODE_ENV === "production" || process.env.APP_ORIGIN?.startsWith("https://") === true,
     path: "/",
     maxAge: SESSION_DAYS * 24 * 60 * 60,
   });

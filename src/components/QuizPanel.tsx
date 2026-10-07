@@ -31,7 +31,7 @@ export default function QuizPanel({ moduleId }: { moduleId: string }) {
   }, [moduleId]);
 
   const submit = async () => {
-    if (answers.some(answer => answer === null)) { setError(lang === "el" ? "Απάντησε πρώτα σε όλες τις ερωτήσεις." : "Answer every question before submitting."); return; }
+    if (answers.some(answer => answer === null)) { setError(lang === "el" ? "Απάντησε σε όλες τις ερωτήσεις πριν υποβάλεις το κουίζ." : "Answer every question before submitting."); return; }
     setBusy(true); setError("");
     try {
       await ensureSession();
@@ -44,7 +44,7 @@ export default function QuizPanel({ moduleId }: { moduleId: string }) {
     finally { setBusy(false); }
   };
 
-  if (loading) return <div className="panel p-10 text-center text-[12px] text-soft" role="status">{lang === "el" ? "Φόρτωση ερωτήσεων..." : "Loading questions..."}</div>;
+  if (loading) return <div className="panel p-10 text-center text-[12px] text-soft" role="status">{lang === "el" ? "Φόρτωση κουίζ..." : "Loading questions..."}</div>;
   return <div className="space-y-4"><section className="panel overflow-hidden"><div className="border-b border-[#334036] bg-[radial-gradient(circle_at_90%_0%,rgba(197,244,123,.12),transparent_45%),#1b2922] p-5 md:p-6"><span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[#30472d] text-lime"><BookOpenCheck size={20} /></span><h2 className="display-font mt-3 text-[20px] font-bold"><T>Knowledge check</T></h2><p className="mt-1 text-[11px] leading-relaxed text-[#a6b9aa]"><T>Learn the concepts first, then test your understanding with three quick questions.</T></p><p className="mt-2 text-[10px] text-[#90a49b]"><T>All answers are checked on the server. Your best result is saved.</T></p>{best && <div className="mt-4 inline-flex items-center gap-2 rounded-md border border-[#5a794d] bg-[#283e2a] px-3 py-1.5 text-[11px] font-bold text-lime"><CheckCircle2 size={13} /><T>Your best score</T>: {best.score}/{best.total} · {best.attempts} {lang === "el" ? "προσπάθειες" : "attempts"}</div>}</div>
       <div className="divide-y divide-[#2d3940]">{questions.map((question, index) => {
         const feedback = result?.feedback[index];
@@ -54,6 +54,6 @@ export default function QuizPanel({ moduleId }: { moduleId: string }) {
         })}</div>{feedback && <div className={`mt-3 rounded-lg border p-3 text-[11px] leading-relaxed ${feedback.correct ? "border-[#55734d] bg-[#233629] text-[#cbe5b9]" : "border-[#755453] bg-[#34262a] text-[#ebc5bd]"}`}><strong>{feedback.correct ? (lang === "el" ? "Σωστά!" : "Correct!") : (lang === "el" ? "Σωστή απάντηση:" : "Correct answer:") + " " + b(feedback.correctChoice)}</strong><p className="mt-1">{b(feedback.why)}</p></div>}</div>;
       })}</div></section>
     {error && <div className="alert-error" role="alert">{error === "quiz-load" ? (lang === "el" ? "Δεν ήταν δυνατή η φόρτωση του κουίζ." : "Could not load the quiz.") : error}</div>}
-    <div className="flex flex-wrap items-center gap-3">{result ? <><div className={`rounded-lg border px-4 py-3 text-[12px] font-bold ${result.score === result.total ? "border-[#739657] bg-[#293f2e] text-lime" : "border-[#675f41] bg-[#343022] text-[#e9cb88]"}`}>{result.score === result.total ? <T>Excellent work!</T> : <T>Keep practicing</T>} · {result.score}/{result.total}</div><button className="btn-secondary" onClick={() => { setAnswers(Array(questions.length).fill(null)); setResult(null); setError(""); }}><RotateCcw size={14} /><T>Try again</T></button><p className="text-[10px] text-[#91a1a9]"><T>Review the explanations below, then try again.</T></p></> : <button className="btn-primary" onClick={() => void submit()} disabled={busy || questions.length === 0}>{busy ? (lang === "el" ? "Έλεγχος..." : "Checking...") : <T>Submit answers</T>} <ArrowRight size={14} /></button>}</div>
+    <div className="flex flex-wrap items-center gap-3">{result ? <><div className={`rounded-lg border px-4 py-3 text-[12px] font-bold ${result.score === result.total ? "border-[#739657] bg-[#293f2e] text-lime" : "border-[#675f41] bg-[#343022] text-[#e9cb88]"}`}>{result.score === result.total ? <T>Excellent work!</T> : <T>Keep practicing</T>} · {result.score}/{result.total}</div><button className="btn-secondary" onClick={() => { setAnswers(Array(questions.length).fill(null)); setResult(null); setError(""); }}><RotateCcw size={14} /><T>Try again</T></button><p className="text-[10px] text-[#91a1a9]"><T>Review the explanations below, then try again.</T></p></> : <button className="btn-primary" onClick={() => void submit()} disabled={busy || questions.length === 0}>{busy ? (lang === "el" ? "Υποβολή..." : "Checking...") : <T>Submit answers</T>} <ArrowRight size={14} /></button>}</div>
   </div>;
 }

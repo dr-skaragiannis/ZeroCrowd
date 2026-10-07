@@ -6,6 +6,7 @@ export const users = pgTable("users", {
   displayName: varchar("display_name", { length: 80 }).notNull(),
   email: varchar("email", { length: 254 }).unique(),
   passwordHash: text("password_hash"),
+  recoveryKeyHash: varchar("recovery_key_hash", { length: 64 }),
   bio: text("bio").notNull().default("Building skills, one flag at a time."),
   location: varchar("location", { length: 80 }).notNull().default("Global"),
   isGuest: boolean("is_guest").notNull().default(true),

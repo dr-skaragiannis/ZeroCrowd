@@ -34,6 +34,7 @@ const previewPlayer: Player = {
   displayName: "Alex Morgan",
   email: null,
   passwordHash: null,
+  recoveryKeyHash: null,
   bio: "Curious mind. Relentless learner. Here for the flags.",
   location: "Global",
   isGuest: true,

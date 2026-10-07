@@ -60,11 +60,6 @@ export function ProgressProvider({ initial, children }: { initial: ProgressSnaps
   const [store] = useState(() => createProgressStore(initial));
 
   useEffect(() => {
-    // Guest setup is a one-time background request, never a route refresh.
-    if (store.getSnapshot().isPreview) void store.ensureSession().catch(() => {});
-  }, [store]);
-
-  useEffect(() => {
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const onReturn = () => {
       if (document.visibilityState !== "visible" || store.getSnapshot().isPreview) return;
