@@ -1,0 +1,12 @@
+export type CourseTone = "lime" | "violet" | "cyan" | "orange";
+export type CourseMeta = { title: string; short: string; category: string; level: string; duration: string; tone: CourseTone; image?: string; gradient: string; skills: string[] };
+
+export const COURSE_META: Record<string, CourseMeta> = {
+  forge: { title: "Linux Foundations", short: "From your first command to root access.", category: "FOUNDATIONS", level: "Beginner", duration: "8 hours", tone: "lime", gradient: "radial-gradient(circle at 70% 45%,#405f43,#26362c 45%,#17251f)", skills: ["Linux CLI", "Recon", "Networking", "Privilege Escalation"] },
+  sudorun: { title: "Sudo_Run", short: "Learn Linux by doing, one command at a time.", category: "LINUX BASICS", level: "Beginner", duration: "6 hours", tone: "orange", gradient: "radial-gradient(circle at 70% 45%,#684637,#3b3029 48%,#241f21)", skills: ["Navigation", "Files", "Permissions", "Shell"] },
+  "linux-beginners-2": { title: "Linux: The Next Level", short: "Go deeper into networks, processes and the shell.", category: "LINUX SYSTEMS", level: "Intermediate", duration: "7 hours", tone: "cyan", gradient: "radial-gradient(circle at 70% 45%,#315c62,#213842 48%,#182730)", skills: ["Networking", "Processes", "Scheduling", "Environment"] },
+  "linux-beginners-3": { title: "Linux: Advanced Ops", short: "Script, automate and operate real services.", category: "LINUX SYSTEMS", level: "Intermediate", duration: "7 hours", tone: "lime", gradient: "radial-gradient(circle at 70% 45%,#4b5b32,#303e2a 48%,#20291e)", skills: ["Bash", "Cron", "Apache", "SSH", "FTP"] },
+  wirewalk: { title: "Wirewalk", short: "Navigate the SSH labyrinth, one pivot at a time.", category: "NETWORK SECURITY", level: "Intermediate", duration: "3 hours", tone: "cyan", gradient: "radial-gradient(circle at 70% 45%,#2d5965,#203946 48%,#17232d)", skills: ["SSH Keys", "ProxyJump", "Pivoting", "Tunneling"] },
+  raven: { title: "Operation Raven", short: "One box. Four flags. A full boot2root experience.", category: "RED TEAM OPERATION", level: "Advanced", duration: "5 hours", tone: "violet", image: "/images/operation-raven.png", gradient: "#25243b", skills: ["Recon", "Foothold", "Web Exploitation", "Root"] },
+  "dfir-fieldwork": { title: "DFIR Fieldwork", short: "Follow the evidence through a live incident.", category: "BLUE TEAM OPERATION", level: "Intermediate", duration: "10 hours", tone: "cyan", image: "/images/dfir-fieldwork.png", gradient: "#203944", skills: ["Forensics", "Incident Response", "Malware", "Memory"] },
+};
