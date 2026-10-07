@@ -1,5 +1,7 @@
 import type { Bi } from "./lessons";
+import { CAMPAIGNS } from "./lessons";
 
+type Pair = readonly [en: string, el: string];
 export type QuizQ = {
   q: Bi;
   choices: Bi[];
@@ -7,680 +9,242 @@ export type QuizQ = {
   why: Bi;
 };
 
+const p = (en: string, el: string): Pair => [en, el];
+const bi = (en: string, el: string): Bi => ({ en, el });
+let optionCursor = 0;
+const q = (
+  prompt: Pair,
+  choices: readonly [Pair, Pair, Pair, Pair],
+  correctChoice: number,
+  explanation: Pair,
+): QuizQ => {
+  const correctIndex = optionCursor++ % choices.length;
+  const orderedChoices = choices.filter((_, index) => index !== correctChoice);
+  orderedChoices.splice(correctIndex, 0, choices[correctChoice]);
+  return {
+    q: bi(...prompt),
+    choices: orderedChoices.map(choice => bi(...choice)),
+    answer: correctIndex,
+    why: bi(...explanation),
+  };
+};
+
+/**
+ * Assessments use fresh scenarios to check transfer of understanding rather
+ * than ask learners to repeat the lab instructions or recall command syntax.
+ * Correct answers stay server-side; the quiz API only returns them after a
+ * submission has been graded.
+ */
 export const QUIZZES: Record<string, QuizQ[]> = {
   "linux-basics": [
-    {
-      q: { en: "What does the $ at the end of a bash prompt mean?", el: "Τι σημαίνει το $ στο τέλος του prompt;" },
-      choices: [
-        { en: "You are root", el: "Είσαι root" },
-        { en: "You are a normal user", el: "Είσαι απλός χρήστης" },
-        { en: "The disk is full", el: "Ο δίσκος είναι γεμάτος" },
-        { en: "SSH is connected", el: "Το SSH είναι συνδεδεμένο" },
-      ],
-      answer: 1,
-      why: { en: "$ = unprivileged user. # = root.", el: "Το $ είναι απλός χρήστης. Το # είναι root." },
-    },
-    {
-      q: { en: "Which command prints the current directory?", el: "Ποια εντολή τυπώνει τον τρέχοντα φάκελο;" },
-      choices: [
-        { en: "whoami", el: "whoami" },
-        { en: "ls", el: "ls" },
-        { en: "pwd", el: "pwd" },
-        { en: "cd", el: "cd" },
-      ],
-      answer: 2,
-      why: { en: "pwd = print working directory.", el: "pwd = print working directory." },
-    },
-    {
-      q: { en: "How do you list hidden files?", el: "Πώς εμφανίζεις κρυφά αρχεία;" },
-      choices: [
-        { en: "ls -h", el: "ls -h" },
-        { en: "ls -a", el: "ls -a" },
-        { en: "ls hidden", el: "ls hidden" },
-        { en: "cat -a", el: "cat -a" },
-      ],
-      answer: 1,
-      why: { en: "ls -a shows names that start with a dot.", el: "Το ls -a δείχνει ονόματα που ξεκινούν με τελεία." },
-    },
+    q(p("A prompt ends with a dollar sign. What is the safest conclusion?", "Το prompt τελειώνει με σύμβολο δολαρίου. Ποιο συμπέρασμα είναι ασφαλές;"), [p("The current shell is running as an ordinary user", "Το τρέχον shell εκτελείται ως απλός χρήστης"), p("The machine is definitely remote", "Το μηχάνημα είναι σίγουρα απομακρυσμένο"), p("The session has administrator privileges", "Η συνεδρία έχει δικαιώματα διαχειριστή"), p("The filesystem is read-only", "Το σύστημα αρχείων είναι μόνο για ανάγνωση")], 0, p("A dollar-sign prompt conventionally represents an unprivileged shell; verify identity and scope before acting.", "Το prompt με σύμβολο δολαρίου συνήθως δείχνει μη προνομιούχο shell· έλεγξε ταυτότητα και πεδίο ενεργειών.")),
+    q(p("A folder appears empty in an ordinary listing. What should you consider before reporting it as empty?", "Ένας φάκελος φαίνεται άδειος σε μια συνηθισμένη λίστα. Τι πρέπει να εξετάσεις πριν τον αναφέρεις ως άδειο;"), [p("Hidden entries may have been omitted from the view", "Μπορεί να μην εμφανίστηκαν κρυφές εγγραφές"), p("Every hidden entry is malicious", "Κάθε κρυφή εγγραφή είναι κακόβουλη"), p("The filesystem has no parent directory", "Το σύστημα αρχείων δεν έχει γονικό φάκελο"), p("The account must be an administrator", "Ο λογαριασμός πρέπει να είναι διαχειριστής")], 0, p("Names beginning with a dot are commonly hidden by default; absence from one view is not proof of absence.", "Τα ονόματα που αρχίζουν με τελεία συνήθως κρύβονται· η απουσία από μία προβολή δεν αποδεικνύει ότι δεν υπάρχουν.")),
+    q(p("A relative path points one directory upward and then into a shared folder. What determines where it resolves?", "Μια σχετική διαδρομή ανεβαίνει έναν φάκελο και μετά μπαίνει σε κοινόχρηστο φάκελο. Τι καθορίζει πού θα καταλήξει;"), [p("The current working directory", "Ο τρέχων φάκελος εργασίας"), p("The hostname alone", "Μόνο το όνομα του υπολογιστή"), p("The file's modification time", "Η ώρα τροποποίησης του αρχείου"), p("The user's display name", "Το εμφανιζόμενο όνομα του χρήστη")], 0, p("Relative paths are interpreted from the current working directory, so orientation matters.", "Οι σχετικές διαδρομές υπολογίζονται από τον τρέχοντα φάκελο, άρα ο προσανατολισμός έχει σημασία.")),
   ],
   files: [
-    {
-      q: { en: "An absolute path always starts with…", el: "Μια απόλυτη διαδρομή ξεκινά πάντα με…" },
-      choices: [
-        { en: "~", el: "~" },
-        { en: "/", el: "/" },
-        { en: ".", el: "." },
-        { en: "$HOME", el: "$HOME" },
-      ],
-      answer: 1,
-      why: { en: "Absolute paths begin at the filesystem root /.", el: "Οι απόλυτες διαδρομές ξεκινούν από τη ρίζα /." },
-    },
-    {
-      q: { en: "grep PATTERN file does what?", el: "Τι κάνει το grep PATTERN file;" },
-      choices: [
-        { en: "Deletes matching lines", el: "Διαγράφει γραμμές" },
-        { en: "Searches file contents for PATTERN", el: "Ψάχνει το περιεχόμενο για PATTERN" },
-        { en: "Renames the file", el: "Μετονομάζει το αρχείο" },
-        { en: "Changes permissions", el: "Αλλάζει δικαιώματα" },
-      ],
-      answer: 1,
-      why: { en: "grep filters lines that match a pattern.", el: "Το grep φιλτράρει γραμμές που ταιριάζουν." },
-    },
-    {
-      q: { en: "Which file lists local user accounts?", el: "Ποιο αρχείο έχει τους τοπικούς λογαριασμούς;" },
-      choices: [
-        { en: "/etc/shadow", el: "/etc/shadow" },
-        { en: "/etc/passwd", el: "/etc/passwd" },
-        { en: "/etc/group", el: "/etc/group" },
-        { en: "/home/users", el: "/home/users" },
-      ],
-      answer: 1,
-      why: { en: "/etc/passwd is world-readable and lists users. /etc/shadow holds hashes and is root-only.", el: "Το /etc/passwd έχει χρήστες. Το /etc/shadow έχει hashes και είναι μόνο για root." },
-    },
+    q(p("An analyst needs every report beneath one evidence directory, including nested folders. Which approach best keeps the search focused?", "Ένας αναλυτής χρειάζεται όλες τις αναφορές μέσα σε έναν φάκελο τεκμηρίων, μαζί με τους υποφακέλους. Ποια προσέγγιση κρατά την αναζήτηση στοχευμένη;"), [p("Search recursively from the evidence directory", "Αναζήτηση αναδρομικά από τον φάκελο τεκμηρίων"), p("Search the entire host without a filter", "Αναζήτηση σε όλο το σύστημα χωρίς φίλτρο"), p("Assume reports are only in the home folder", "Υπόθεσε ότι οι αναφορές βρίσκονται μόνο στον προσωπικό φάκελο"), p("Change file ownership before looking", "Άλλαξε ιδιοκτησία αρχείων πριν ψάξεις")], 0, p("A known starting point and a narrow criterion reduce noise and avoid unrelated parts of the filesystem.", "Ένα γνωστό σημείο εκκίνησης και στενά κριτήρια μειώνουν τον θόρυβο και αποφεύγουν άσχετα τμήματα του συστήματος.")),
+    q(p("A search returns a matching line from a log. What does that finding establish by itself?", "Μια αναζήτηση επιστρέφει γραμμή που ταιριάζει σε ένα log. Τι αποδεικνύει από μόνη της αυτή η εύρεση;"), [p("Only that the selected text matched in that file", "Μόνο ότι το κείμενο που επέλεξες ταιριάζει σε εκείνο το αρχείο"), p("That the event definitely happened as described", "Ότι το συμβάν συνέβη σίγουρα όπως περιγράφεται"), p("That every related host is compromised", "Ότι κάθε σχετικός υπολογιστής έχει παραβιαστεί"), p("That the file is authentic and unaltered", "Ότι το αρχείο είναι αυθεντικό και αναλλοίωτο")], 0, p("A text match is a lead. Corroborate its source, time, and surrounding context before drawing a conclusion.", "Η αντιστοίχιση κειμένου είναι ένδειξη. Επιβεβαίωσε την πηγή, τον χρόνο και το περιβάλλον πριν καταλήξεις.")),
+    q(p("A standard local account database lists names, identifiers, and home folders. Where should an investigator expect protected password verifiers instead?", "Μια συνηθισμένη τοπική βάση λογαριασμών εμφανίζει ονόματα, αναγνωριστικά και προσωπικούς φακέλους. Πού αναμένονται προστατευμένα password verifiers;"), [p("In a separately protected credential file", "Σε ξεχωριστό, προστατευμένο αρχείο διαπιστευτηρίων"), p("In the hostname record", "Στην εγγραφή του ονόματος υπολογιστή"), p("In the network route table", "Στον πίνακα δρομολόγησης δικτύου"), p("In every user's public profile", "Στο δημόσιο προφίλ κάθε χρήστη")], 0, p("Account metadata and password material are separated so ordinary users cannot read credential verifiers.", "Τα μεταδεδομένα λογαριασμών διαχωρίζονται από τα password verifiers ώστε οι απλοί χρήστες να μην τα διαβάζουν.")),
   ],
   permissions: [
-    {
-      q: { en: "In -rwxr-xr--, what can 'others' do?", el: "Στο -rwxr-xr--, τι μπορούν οι 'others';" },
-      choices: [
-        { en: "read, write, execute", el: "ανάγνωση, εγγραφή, εκτέλεση" },
-        { en: "read only", el: "μόνο ανάγνωση" },
-        { en: "nothing", el: "τίποτα" },
-        { en: "execute only", el: "μόνο εκτέλεση" },
-      ],
-      answer: 1,
-      why: { en: "The last triple is r-- : read only for others.", el: "Το τελευταίο triple είναι r-- : μόνο ανάγνωση." },
-    },
-    {
-      q: { en: "sudo -l shows…", el: "Το sudo -l δείχνει…" },
-      choices: [
-        { en: "Last logins", el: "Τελευταίες συνδέσεις" },
-        { en: "Commands you may run as root", el: "Εντολές που μπορείς ως root" },
-        { en: "Listening ports", el: "Θύρες σε ακρόαση" },
-        { en: "Kernel modules", el: "Κερνελ modules" },
-      ],
-      answer: 1,
-      why: { en: "sudo -l lists your sudo privileges — a key privesc check.", el: "Το sudo -l είναι βασικός έλεγχος privesc." },
-    },
-    {
-      q: { en: "Why is /etc/shadow not world-readable?", el: "Γιατί το /etc/shadow δεν διαβάζεται από όλους;" },
-      choices: [
-        { en: "It is empty", el: "Είναι άδειο" },
-        { en: "It stores password hashes", el: "Αποθηκεύει hashes κωδικών" },
-        { en: "It is a binary", el: "Είναι binary" },
-        { en: "SELinux forbids it always", el: "Το SELinux το απαγορεύει πάντα" },
-      ],
-      answer: 1,
-      why: { en: "Hashes can be cracked offline if leaked.", el: "Τα hashes σπάνε offline αν διαρρεύσουν." },
-    },
+    q(p("A shared report grants read and write access to its owner, read access to the team, and none to others. What is the main concern if the report contains secrets?", "Μια κοινόχρηστη αναφορά επιτρέπει ανάγνωση και εγγραφή στον ιδιοκτήτη, ανάγνωση στην ομάδα και τίποτα στους υπόλοιπους. Ποιος είναι ο βασικός κίνδυνος αν περιέχει μυστικά;"), [p("Every team member can read the secrets", "Κάθε μέλος της ομάδας μπορεί να διαβάσει τα μυστικά"), p("The owner cannot modify the report", "Ο ιδιοκτήτης δεν μπορεί να τροποποιήσει την αναφορά"), p("The file is automatically executable", "Το αρχείο γίνεται αυτόματα εκτελέσιμο"), p("The report is encrypted at rest", "Η αναφορά κρυπτογραφείται αυτόματα στον δίσκο")], 0, p("Group read permission still exposes the contents to all members of that group; classify data before sharing.", "Τα δικαιώματα ανάγνωσης ομάδας εκθέτουν το περιεχόμενο σε όλα τα μέλη της· ταξινόμησε τα δεδομένα πριν τα μοιραστείς.")),
+    q(p("A maintenance task needs one privileged action, but the operator's account currently has broad administrator access. What is the better long-term design?", "Μια εργασία συντήρησης χρειάζεται μία προνομιούχα ενέργεια, αλλά ο λογαριασμός έχει ευρεία πρόσβαση διαχειριστή. Ποιος είναι ο καλύτερος μακροπρόθεσμος σχεδιασμός;"), [p("Grant only the specific action for the required duration", "Δώσε μόνο τη συγκεκριμένη ενέργεια και για όσο χρειάζεται"), p("Share the administrator password with the whole team", "Μοιράσου τον κωδικό διαχειριστή με όλη την ομάδα"), p("Make every system file writable", "Κάνε εγγράψιμα όλα τα αρχεία του συστήματος"), p("Disable audit logging", "Απενεργοποίησε την καταγραφή ελέγχου")], 0, p("Least privilege limits the impact of mistakes and compromised accounts.", "Η αρχή των ελάχιστων δικαιωμάτων περιορίζει τις επιπτώσεις λαθών και παραβιασμένων λογαριασμών.")),
+    q(p("A file can be read by an account but not executed by it. Which interpretation is correct?", "Ένας λογαριασμός μπορεί να διαβάσει ένα αρχείο αλλά όχι να το εκτελέσει. Ποια ερμηνεία είναι σωστή;"), [p("Read and execute are separate permissions", "Η ανάγνωση και η εκτέλεση είναι ξεχωριστά δικαιώματα"), p("Read permission always grants administrator access", "Η ανάγνωση δίνει πάντα δικαιώματα διαχειριστή"), p("The file must be a directory", "Το αρχείο πρέπει να είναι φάκελος"), p("The owner field is ignored", "Το πεδίο ιδιοκτήτη αγνοείται")], 0, p("Permission bits are independent: reading contents does not automatically allow the file to run.", "Τα bit δικαιωμάτων είναι ανεξάρτητα: η ανάγνωση περιεχομένου δεν επιτρέπει αυτόματα την εκτέλεση.")),
   ],
   networking: [
-    {
-      q: { en: "What does ping test?", el: "Τι ελέγχει το ping;" },
-      choices: [
-        { en: "Open TCP ports", el: "Ανοιχτές TCP θύρες" },
-        { en: "ICMP echo connectivity", el: "Συνδεσιμότητα ICMP echo" },
-        { en: "DNSSEC", el: "DNSSEC" },
-        { en: "TLS certificates", el: "Πιστοποιητικά TLS" },
-      ],
-      answer: 1,
-      why: { en: "Ping sends ICMP echo requests. Hosts may block ICMP and still be up.", el: "Το ping στέλνει ICMP. Κάποιοι hosts το μπλοκάρουν." },
-    },
-    {
-      q: { en: "10.10.10.0/24 contains how many addresses?", el: "Το 10.10.10.0/24 έχει πόσες διευθύνσεις;" },
-      choices: [
-        { en: "24", el: "24" },
-        { en: "256", el: "256" },
-        { en: "10", el: "10" },
-        { en: "65536", el: "65536" },
-      ],
-      answer: 1,
-      why: { en: "/24 means 8 host bits → 256 addresses (254 usable).", el: "/24 = 8 host bits → 256 διευθύνσεις." },
-    },
-    {
-      q: { en: "Scanning a network you do not own is…", el: "Η σάρωση δικτύου που δεν σου ανήκει είναι…" },
-      choices: [
-        { en: "Always fine", el: "Πάντα εντάξει" },
-        { en: "A crime without permission", el: "Έγκλημα χωρίς άδεια" },
-        { en: "Required by ISO", el: "Υποχρεωτική από ISO" },
-        { en: "Only illegal on port 22", el: "Παράνομη μόνο στη θύρα 22" },
-      ],
-      answer: 1,
-      why: { en: "Get written permission. GAMEHACK is a sandbox.", el: "Πάρε γραπτή άδεια. Το GAMEHACK είναι sandbox." },
-    },
+    q(p("A device is assigned an address in a /24 network. What does the suffix describe?", "Μια συσκευή έχει διεύθυνση σε δίκτυο /24. Τι περιγράφει το επίθημα;"), [p("The number of network-prefix bits", "Τον αριθμό bit του προθέματος δικτύου"), p("The number of open ports", "Τον αριθμό ανοικτών θυρών"), p("The device's hardware vendor", "Τον κατασκευαστή της συσκευής"), p("The encryption strength", "Την ισχύ κρυπτογράφησης")], 0, p("The prefix length identifies the network portion of the address; it is not a port count or a security rating.", "Το μήκος προθέματος προσδιορίζει το τμήμα δικτύου της διεύθυνσης· δεν είναι αριθμός θυρών ή βαθμός ασφάλειας.")),
+    q(p("A reachability probe receives no reply from a workstation. Which conclusion is justified?", "Ένα probe προσβασιμότητας δεν λαμβάνει απάντηση από σταθμό εργασίας. Ποιο συμπέρασμα δικαιολογείται;"), [p("The probe received no reply; filtering or host state may explain it", "Το probe δεν έλαβε απάντηση· φιλτράρισμα ή κατάσταση host μπορεί να το εξηγεί"), p("The workstation is certainly powered off", "Ο σταθμός εργασίας είναι σίγουρα κλειστός"), p("The network has no security controls", "Το δίκτυο δεν έχει ελέγχους ασφαλείας"), p("The workstation has no services", "Ο σταθμός εργασίας δεν έχει υπηρεσίες")], 0, p("A missing reply is ambiguous. Firewalls, routing, and host configuration can all affect probe results.", "Η απουσία απάντησης είναι αμφίσημη. Firewall, δρομολόγηση και ρυθμίσεις host επηρεάζουν τα αποτελέσματα.")),
+    q(p("A colleague asks you to examine a network that is not in the written engagement. What should you do first?", "Ένας συνάδελφος ζητά να εξετάσεις δίκτυο που δεν περιλαμβάνεται στην έγγραφη ανάθεση. Τι πρέπει να κάνεις πρώτα;"), [p("Pause and obtain explicit authorization and scope", "Σταμάτησε και εξασφάλισε ρητή άδεια και πεδίο ελέγχου"), p("Probe it quietly to avoid delay", "Έλεγξέ το κρυφά για να μην καθυστερήσεις"), p("Assume it is allowed because it is nearby", "Υπέθεσε ότι επιτρέπεται επειδή είναι κοντά"), p("Ask the target system for credentials", "Ζήτησε διαπιστευτήρια από το σύστημα-στόχο")], 0, p("Network testing must stay within documented authorization, targets, timing, and methods.", "Οι δοκιμές δικτύου πρέπει να μένουν μέσα στα τεκμηριωμένα όρια άδειας, στόχων, χρόνου και μεθόδων.")),
   ],
   recon: [
-    {
-      q: { en: "Passive recon means…", el: "Παθητική recon σημαίνει…" },
-      choices: [
-        { en: "Sending nmap SYN packets", el: "Αποστολή nmap SYN" },
-        { en: "Using public data without touching the target", el: "Δημόσια δεδομένα χωρίς επαφή με τον στόχο" },
-        { en: "DDoS", el: "DDoS" },
-        { en: "Exploiting a CVE", el: "Εκμετάλλευση CVE" },
-      ],
-      answer: 1,
-      why: { en: "Passive = OSINT, DNS, archives. Active = packets to the target.", el: "Παθητική = OSINT. Ενεργητική = πακέτα." },
-    },
-    {
-      q: { en: "nmap 10.10.10.0/24 is primarily a…", el: "Το nmap 10.10.10.0/24 είναι κυρίως…" },
-      choices: [
-        { en: "Web exploit", el: "Web exploit" },
-        { en: "Subnet host discovery", el: "Ανακάλυψη hosts στο subnet" },
-        { en: "Password crack", el: "Σπάσιμο κωδικού" },
-        { en: "Rootkit", el: "Rootkit" },
-      ],
-      answer: 1,
-      why: { en: "A sweep finds live hosts before you port-scan one of them.", el: "Η σάρωση βρίσκει ζωντανούς hosts." },
-    },
-    {
-      q: { en: "You should only scan…", el: "Πρέπει να σαρώνεις μόνο…" },
-      choices: [
-        { en: "Famous companies", el: "Διάσημες εταιρείες" },
-        { en: "In-scope systems you are allowed to test", el: "Συστήματα εντός scope με άδεια" },
-        { en: "Anything with port 80", el: "Οτιδήποτε με θύρα 80" },
-        { en: "Random /8s", el: "Τυχαία /8" },
-      ],
-      answer: 1,
-      why: { en: "Scope and permission are non-negotiable.", el: "Το scope και η άδεια δεν συζητιούνται." },
-    },
+    q(p("You are preparing a report using public records and existing documentation, without contacting the target systems. How is this collection best described?", "Ετοιμάζεις αναφορά από δημόσια αρχεία και υπάρχουσα τεκμηρίωση, χωρίς επικοινωνία με τα συστήματα-στόχους. Πώς περιγράφεται καλύτερα αυτή η συλλογή;"), [p("Passive reconnaissance", "Παθητική αναγνώριση"), p("Credential validation", "Επικύρωση διαπιστευτηρίων"), p("Exploit execution", "Εκτέλεση exploit"), p("Privilege escalation", "Κλιμάκωση δικαιωμάτων")], 0, p("Passive collection uses existing sources and avoids direct interaction with the target.", "Η παθητική συλλογή χρησιμοποιεί υπάρχουσες πηγές και αποφεύγει την άμεση αλληλεπίδραση με τον στόχο.")),
+    q(p("An authorized discovery sweep finds several responding devices. What is the most useful next step before probing services?", "Μια εγκεκριμένη σάρωση εντοπίζει αρκετές συσκευές που αποκρίνονται. Ποιο είναι το χρησιμότερο επόμενο βήμα πριν ελέγξεις υπηρεσίες;"), [p("Confirm discovered addresses are in scope and document the inventory", "Επιβεβαίωσε ότι οι διευθύνσεις ανήκουν στο πεδίο και τεκμηρίωσε την απογραφή"), p("Try default passwords on every device", "Δοκίμασε προεπιλεγμένους κωδικούς σε κάθε συσκευή"), p("Assume every reply indicates a vulnerability", "Υπέθεσε ότι κάθε απάντηση δείχνει ευπάθεια"), p("Run destructive tests immediately", "Εκτέλεσε αμέσως καταστροφικές δοκιμές")], 0, p("Validate scope first, then use a measured process to identify exposed services and preserve evidence.", "Επικύρωσε πρώτα το πεδίο και μετά ακολούθησε μετρημένη διαδικασία εντοπισμού υπηρεσιών και διατήρησης στοιχείων.")),
+    q(p("Two sources disagree about whether a hostname belongs to the organization. How should you treat it?", "Δύο πηγές διαφωνούν για το αν ένα hostname ανήκει στον οργανισμό. Πώς πρέπει να το χειριστείς;"), [p("Record the uncertainty and corroborate ownership", "Κατέγραψε την αβεβαιότητα και επιβεβαίωσε την ιδιοκτησία"), p("Choose the source that suggests a larger target", "Επίλεξε την πηγή που δείχνει μεγαλύτερο στόχο"), p("Treat both sources as proof of compromise", "Θεώρησε και τις δύο πηγές απόδειξη παραβίασης"), p("Hide the disagreement from the report", "Απόκρυψε τη διαφωνία από την αναφορά")], 0, p("Reconnaissance produces leads, not certainty. Provenance and confidence should be recorded.", "Η αναγνώριση παράγει ενδείξεις, όχι βεβαιότητα. Κατέγραψε προέλευση και βαθμό εμπιστοσύνης.")),
   ],
   scanning: [
-    {
-      q: { en: "nmap -sV is used to…", el: "Το nmap -sV χρησιμεύει για…" },
-      choices: [
-        { en: "DDoS a host", el: "DDoS" },
-        { en: "Detect service versions", el: "Ανίχνευση εκδόσεων υπηρεσιών" },
-        { en: "Disable a firewall", el: "Απενεργοποίηση firewall" },
-        { en: "Crack hashes", el: "Σπάσιμο hashes" },
-      ],
-      answer: 1,
-      why: { en: "-sV probes banners so you know which software (and version) answers.", el: "Το -sV διαβάζει banners." },
-    },
-    {
-      q: { en: "An open port 22 typically means…", el: "Ανοιχτή θύρα 22 συνήθως σημαίνει…" },
-      choices: [
-        { en: "HTTP", el: "HTTP" },
-        { en: "SSH", el: "SSH" },
-        { en: "SMTP", el: "SMTP" },
-        { en: "RDP", el: "RDP" },
-      ],
-      answer: 1,
-      why: { en: "22/tcp is the IANA port for SSH.", el: "22/tcp = SSH." },
-    },
-    {
-      q: { en: "Why grab HTTP with curl during scanning?", el: "Γιατί curl στο HTTP στη σάρωση;" },
-      choices: [
-        { en: "To mine bitcoin", el: "Για bitcoin" },
-        { en: "To read banners, titles, tech stack clues", el: "Για banners, τίτλους, ενδείξεις stack" },
-        { en: "To wipe logs", el: "Για να σβήσεις logs" },
-        { en: "It is required by TCP", el: "Το απαιτεί το TCP" },
-      ],
-      answer: 1,
-      why: { en: "A homepage often leaks CMS names and versions.", el: "Η αρχική συχνά αποκαλύπτει CMS." },
-    },
+    q(p("A network service responds on a port and reports a product release. What should you infer?", "Μια υπηρεσία δικτύου αποκρίνεται σε θύρα και αναφέρει έκδοση προϊόντος. Τι πρέπει να συμπεράνεις;"), [p("The response is a fingerprint to validate, not proof of vulnerability", "Η απάντηση είναι αποτύπωμα προς επιβεβαίωση, όχι απόδειξη ευπάθειας"), p("The host is definitely compromised", "Ο host είναι σίγουρα παραβιασμένος"), p("The reported release cannot be spoofed", "Η αναφερόμενη έκδοση δεν μπορεί να πλαστογραφηθεί"), p("Every port on that host is exposed", "Κάθε θύρα του host είναι εκτεθειμένη")], 0, p("Banners can be inaccurate or deliberately changed; confirm findings with additional evidence.", "Τα banners μπορεί να είναι ανακριβή ή αλλαγμένα επίτηδες· επιβεβαίωσε ευρήματα με πρόσθετα στοιχεία.")),
+    q(p("A production server exposes an unexpected remote-administration service. Which response is most responsible?", "Ένας production server εκθέτει απρόσμενη υπηρεσία απομακρυσμένης διαχείρισης. Ποια αντίδραση είναι πιο υπεύθυνη;"), [p("Validate scope, record the exposure, and notify the owner", "Επικύρωσε το πεδίο, κατέγραψε την έκθεση και ειδοποίησε τον υπεύθυνο"), p("Attempt to log in with common passwords", "Προσπάθησε να συνδεθείς με συνηθισμένους κωδικούς"), p("Publish the address and version publicly", "Δημοσίευσε δημόσια τη διεύθυνση και την έκδοση"), p("Disable monitoring to avoid alerts", "Απενεργοποίησε την παρακολούθηση για να αποφύγεις ειδοποιήσεις")], 0, p("Unexpected exposure should be verified and reported through the authorized process, not exploited.", "Η απρόσμενη έκθεση πρέπει να επιβεβαιώνεται και να αναφέρεται με εξουσιοδοτημένη διαδικασία, όχι να αξιοποιείται.")),
+    q(p("A web endpoint returns a server banner and a page title. What do these artifacts provide?", "Ένα web endpoint επιστρέφει banner διακομιστή και τίτλο σελίδας. Τι προσφέρουν αυτά τα τεκμήρια;"), [p("Context for prioritizing follow-up checks", "Πλαίσιο για ιεράρχηση επόμενων ελέγχων"), p("Proof that user data was stolen", "Απόδειξη ότι κλάπηκαν δεδομένα χρηστών"), p("Proof that the service is patched", "Απόδειξη ότι η υπηρεσία έχει διορθωθεί"), p("An administrator password", "Κωδικό διαχειριστή")], 0, p("Service metadata helps shape a hypothesis, but it does not establish impact by itself.", "Τα μεταδεδομένα υπηρεσίας βοηθούν στη διαμόρφωση υπόθεσης, αλλά δεν αποδεικνύουν από μόνα τους τον αντίκτυπο.")),
   ],
   bruteforce: [
-    {
-      q: { en: "A dictionary attack tries…", el: "Μια επίθεση λεξικού δοκιμάζει…" },
-      choices: [
-        { en: "Every possible byte", el: "Κάθε δυνατό byte" },
-        { en: "Passwords from a list of likely values", el: "Κωδικούς από λίστα πιθανών τιμών" },
-        { en: "Only the empty password", el: "Μόνο κενό κωδικό" },
-        { en: "TLS session keys", el: "Κλειδιά TLS" },
-      ],
-      answer: 1,
-      why: { en: "Dictionaries are faster than true brute force because humans pick predictable passwords.", el: "Τα λεξικά είναι ταχύτερα γιατί οι άνθρωποι διαλέγουν προβλέψιμους κωδικούς." },
-    },
-    {
-      q: { en: "Best defence against SSH password sprays?", el: "Καλύτερη άμυνα στα SSH sprays;" },
-      choices: [
-        { en: "A longer MOTD", el: "Μεγαλύτερο MOTD" },
-        { en: "Disable passwords, use keys + MFA, rate-limit", el: "Κλειδιά + MFA, χωρίς passwords, rate-limit" },
-        { en: "Open port 22 to the world", el: "Άνοιγμα 22 στον κόσμο" },
-        { en: "Use telnet instead", el: "Telnet" },
-      ],
-      answer: 1,
-      why: { en: "Key-only SSH plus monitoring makes hydra-style attacks fail loudly.", el: "SSH μόνο με κλειδιά και monitoring." },
-    },
-    {
-      q: { en: "Running hydra against a random internet host is…", el: "Το hydra σε τυχαίο host του internet είναι…" },
-      choices: [
-        { en: "Fine if you are curious", el: "ΟΚ αν είσαι περίεργος" },
-        { en: "Illegal without authorisation", el: "Παράνομο χωρίς εξουσιοδότηση" },
-        { en: "A NIST requirement", el: "Απαίτηση NIST" },
-        { en: "Only rude", el: "Απλώς αγενές" },
-      ],
-      answer: 1,
-      why: { en: "Credential attacks without permission are a crime. Lab only.", el: "Επιθέσεις διαπιστευτηρίων χωρίς άδεια είναι έγκλημα." },
-    },
+    q(p("A login test cycles through entries from a prepared password list. What kind of technique is being simulated?", "Μια δοκιμή σύνδεσης ελέγχει διαδοχικά στοιχεία από έτοιμη λίστα κωδικών. Ποια τεχνική προσομοιώνεται;"), [p("A dictionary-based credential attack", "Επίθεση διαπιστευτηρίων με λεξικό"), p("A passive packet capture", "Παθητική καταγραφή πακέτων"), p("A file-integrity check", "Έλεγχος ακεραιότητας αρχείων"), p("A cryptographic signature", "Κρυπτογραφική υπογραφή")], 0, p("A prepared candidate list is used to test whether weak or reused credentials are accepted.", "Μια έτοιμη λίστα υποψηφίων ελέγχει αν γίνονται δεκτά αδύναμα ή επαναχρησιμοποιημένα διαπιστευτήρια.")),
+    q(p("Which control most directly reduces the chance that repeated password guesses succeed?", "Ποιος έλεγχος μειώνει πιο άμεσα την πιθανότητα επιτυχίας επαναλαμβανόμενων δοκιμών κωδικών;"), [p("Rate limits, multifactor authentication, and detection of repeated failures", "Όρια ρυθμού, πολυπαραγοντικός έλεγχος και εντοπισμός επαναλαμβανόμενων αποτυχιών"), p("A longer login banner", "Μεγαλύτερο μήνυμα σύνδεσης"), p("Publicly listing valid usernames", "Δημόσια λίστα έγκυρων ονομάτων χρηστών"), p("Disabling audit records", "Απενεργοποίηση αρχείων ελέγχου")], 0, p("Layered authentication controls make guessing slower, less useful, and more visible.", "Οι πολυεπίπεδοι έλεγχοι ταυτοποίησης επιβραδύνουν τις δοκιμές, μειώνουν την αξία τους και τις κάνουν ορατές.")),
+    q(p("A teammate suggests testing a public login page because it resembles the training target. What is the right response?", "Ένας συνάδελφος προτείνει να δοκιμάσετε δημόσια σελίδα σύνδεσης επειδή μοιάζει με τον στόχο του εργαστηρίου. Ποια είναι η σωστή αντίδραση;"), [p("Do not test it without explicit authorization and rate limits", "Μην τη δοκιμάσεις χωρίς ρητή άδεια και όρια ρυθμού"), p("Try only a few guesses without asking", "Δοκίμασε λίγους κωδικούς χωρίς να ρωτήσεις"), p("Use a larger list to finish quickly", "Χρησιμοποίησε μεγαλύτερη λίστα για να τελειώσεις γρήγορα"), p("Assume public services are in scope", "Υπέθεσε ότι οι δημόσιες υπηρεσίες είναι εντός πεδίου")], 0, p("Credential testing can lock accounts or expose data. Written scope and safeguards are mandatory.", "Οι δοκιμές διαπιστευτηρίων μπορεί να κλειδώσουν λογαριασμούς ή να εκθέσουν δεδομένα. Απαιτούνται έγγραφη άδεια και δικλίδες ασφαλείας.")),
   ],
   sqli: [
-    {
-      q: { en: "SQL injection happens when…", el: "Το SQLi συμβαίνει όταν…" },
-      choices: [
-        { en: "TLS is too new", el: "Το TLS είναι νέο" },
-        { en: "Untrusted input is concatenated into a query", el: "Μη έμπιστη είσοδος μπαίνει σε ερώτημα" },
-        { en: "The DB is PostgreSQL", el: "Η βάση είναι PostgreSQL" },
-        { en: "The server uses IPv6", el: "Ο server έχει IPv6" },
-      ],
-      answer: 1,
-      why: { en: "Fix: parameterised queries / prepared statements, never string concat.", el: "Λύση: parameterized queries, ποτέ concat." },
-    },
-    {
-      q: { en: "A single quote in an id= parameter is often used to…", el: "Το μονό εισαγωγικό σε id= συχνά…" },
-      choices: [
-        { en: "Beautify HTML", el: "Ομορφαίνει HTML" },
-        { en: "Test if the query syntax breaks", el: "Ελέγχει αν σπάει η σύνταξη" },
-        { en: "Enable HTTP/2", el: "Ενεργοποιεί HTTP/2" },
-        { en: "Reset a password", el: "Κάνει reset κωδικού" },
-      ],
-      answer: 1,
-      why: { en: "A syntax error (or odd response) is a detection signal — in a lab.", el: "Σφάλμα σύνταξης είναι σήμα ανίχνευσης — στο lab." },
-    },
-    {
-      q: { en: "The defender's first control against SQLi is…", el: "Το πρώτο μέτρο του defender είναι…" },
-      choices: [
-        { en: "More RAM", el: "Περισσότερη RAM" },
-        { en: "Parameterised queries and least-privilege DB users", el: "Parameterized queries και least-privilege" },
-        { en: "Disabling HTTPS", el: "Απενεργοποίηση HTTPS" },
-        { en: "Using FTP", el: "FTP" },
-      ],
-      answer: 1,
-      why: { en: "ORMs + bound parameters + a DB account that cannot DROP TABLE.", el: "ORM + bound parameters + λογαριασμός χωρίς DROP." },
-    },
+    q(p("An application builds a database query by joining untrusted input directly into its text. What is the core design weakness?", "Μια εφαρμογή δημιουργεί ερώτημα βάσης συνενώνοντας απευθείας μη έμπιστη είσοδο στο κείμενό του. Ποια είναι η βασική αδυναμία σχεδιασμού;"), [p("Data and query structure are not kept separate", "Τα δεδομένα δεν διαχωρίζονται από τη δομή του ερωτήματος"), p("The database uses too many tables", "Η βάση χρησιμοποιεί υπερβολικά πολλούς πίνακες"), p("The browser has JavaScript enabled", "Το πρόγραμμα περιήγησης έχει ενεργό JavaScript"), p("The server sends encrypted traffic", "Ο διακομιστής στέλνει κρυπτογραφημένη κίνηση")], 0, p("Treating input as query syntax allows data to alter the intended database operation.", "Όταν η είσοδος αντιμετωπίζεται ως σύνταξη ερωτήματος, μπορεί να αλλάξει τη λειτουργία της βάσης.")),
+    q(p("A punctuation change causes a database error on a test page. What is the best interpretation?", "Μια αλλαγή στίξης προκαλεί σφάλμα βάσης σε δοκιμαστική σελίδα. Ποια είναι η καλύτερη ερμηνεία;"), [p("It is a lead that needs safe, authorized validation", "Είναι ένδειξη που χρειάζεται ασφαλή και εξουσιοδοτημένη επιβεβαίωση"), p("It proves data was extracted", "Αποδεικνύει ότι εξήχθησαν δεδομένα"), p("It proves administrator access", "Αποδεικνύει πρόσβαση διαχειριστή"), p("It confirms the database is encrypted", "Επιβεβαιώνει ότι η βάση είναι κρυπτογραφημένη")], 0, p("An error may have many causes. Do not infer impact without a controlled test and supporting evidence.", "Ένα σφάλμα μπορεί να έχει πολλές αιτίες. Μην συμπεραίνεις αντίκτυπο χωρίς ελεγχόμενη δοκιμή και υποστηρικτικά στοιχεία.")),
+    q(p("Which application change best prevents untrusted values from changing the meaning of a database query?", "Ποια αλλαγή εφαρμογής εμποδίζει καλύτερα τις μη έμπιστες τιμές να αλλάζουν το νόημα ενός ερωτήματος βάσης;"), [p("Use parameterized queries and validate input", "Χρήση παραμετροποιημένων ερωτημάτων και επικύρωση εισόδου"), p("Hide the database name from the page", "Απόκρυψη ονόματος βάσης από τη σελίδα"), p("Rely on a client-side check alone", "Αποκλειστική εξάρτηση από έλεγχο στο πρόγραμμα περιήγησης"), p("Give the web account full database administration rights", "Πλήρη δικαιώματα διαχείρισης βάσης στον web λογαριασμό")], 0, p("Bound parameters keep user data separate from query structure; server-side validation adds defense in depth.", "Οι δεσμευμένες παράμετροι διαχωρίζουν τα δεδομένα χρήστη από τη δομή ερωτήματος· η επικύρωση στον διακομιστή προσθέτει άμυνα σε βάθος.")),
   ],
   privesc: [
-    {
-      q: { en: "Privilege escalation is…", el: "Η ανύψωση προνομίων είναι…" },
-      choices: [
-        { en: "The first packet you send", el: "Το πρώτο πακέτο" },
-        { en: "Moving from a low user to a more powerful one", el: "Από χαμηλό χρήστη σε ισχυρότερο" },
-        { en: "Buying a bigger NIC", el: "Μεγαλύτερο NIC" },
-        { en: "Changing DNS", el: "Αλλαγή DNS" },
-      ],
-      answer: 1,
-      why: { en: "After a foothold, enumerate sudo, SUID, cron, kernel.", el: "Μετά το foothold: sudo, SUID, cron, kernel." },
-    },
-    {
-      q: { en: "Why is `sudo find` dangerous?", el: "Γιατί είναι επικίνδυνο το sudo find;" },
-      choices: [
-        { en: "find is slow", el: "Το find είναι αργό" },
-        { en: "It can execute commands as root (GTFOBins)", el: "Μπορεί να εκτελέσει εντολές ως root" },
-        { en: "It deletes /", el: "Διαγράφει το /" },
-        { en: "It disables SELinux", el: "Κλείνει SELinux" },
-      ],
-      answer: 1,
-      why: { en: "Many Unix tools have breakout flags. Don't sudo them.", el: "Πολλά Unix tools έχουν breakout. Μην τα κάνεις sudo." },
-    },
-    {
-      q: { en: "Least privilege means…", el: "Least privilege σημαίνει…" },
-      choices: [
-        { en: "Everyone is root", el: "Όλοι είναι root" },
-        { en: "Grant only the rights needed to do the job", el: "Δώσε μόνο τα απαραίτητα δικαιώματα" },
-        { en: "Disable logging", el: "Κλείσε logging" },
-        { en: "Share one password", el: "Ένας κοινός κωδικός" },
-      ],
-      answer: 1,
-      why: { en: "The smaller the sudoers file, the smaller the blast radius.", el: "Μικρότερο sudoers = μικρότερη ακτίνα έκρηξης." },
-    },
+    q(p("A standard account can run one administrative maintenance action. What is the key question in a privilege review?", "Ένας απλός λογαριασμός μπορεί να εκτελέσει μία διοικητική εργασία συντήρησης. Ποιο είναι το βασικό ερώτημα σε έλεγχο δικαιωμάτων;"), [p("Can the permitted action be repurposed to affect unrelated files or services?", "Μπορεί η επιτρεπόμενη ενέργεια να χρησιμοποιηθεί για άσχετα αρχεία ή υπηρεσίες;"), p("Does the account have a memorable display name?", "Έχει ο λογαριασμός εύκολο εμφανιζόμενο όνομα;"), p("Is the host connected to Wi-Fi?", "Είναι ο host συνδεδεμένος σε Wi-Fi;"), p("Does the shell use a dark theme?", "Χρησιμοποιεί το shell σκοτεινό θέμα;")], 0, p("Privilege escalation often comes from an overly broad capability, not just from a password issue.", "Η κλιμάκωση δικαιωμάτων συχνά προκύπτει από υπερβολικά ευρεία δυνατότητα, όχι μόνο από πρόβλημα κωδικού.")),
+    q(p("A privileged program runs with its owner's authority and is writable by ordinary users. Why is this dangerous?", "Ένα προνομιούχο πρόγραμμα εκτελείται με τα δικαιώματα του ιδιοκτήτη του και μπορεί να τροποποιηθεί από απλούς χρήστες. Γιατί είναι επικίνδυνο;"), [p("A user may influence code that later runs with greater authority", "Ο χρήστης μπορεί να επηρεάσει κώδικα που αργότερα εκτελείται με περισσότερα δικαιώματα"), p("It automatically encrypts user files", "Κρυπτογραφεί αυτόματα τα αρχεία χρηστών"), p("It disables network segmentation", "Απενεργοποιεί τον διαχωρισμό δικτύου"), p("It only changes the program's color", "Αλλάζει μόνο το χρώμα του προγράμματος")], 0, p("A writable privileged execution path can turn a low-privilege edit into a high-privilege action.", "Μια εγγράψιμη προνομιούχα διαδρομή εκτέλεσης μπορεί να μετατρέψει αλλαγή χαμηλού δικαιώματος σε ενέργεια υψηλού δικαιώματος.")),
+    q(p("You find a possible escalation path on an authorized lab host. What should your notes include?", "Βρίσκεις πιθανή διαδρομή κλιμάκωσης σε εξουσιοδοτημένο host εργαστηρίου. Τι πρέπει να περιλαμβάνουν οι σημειώσεις σου;"), [p("The evidence, the affected account, the exact scope, and a safe impact explanation", "Τα στοιχεία, τον επηρεαζόμενο λογαριασμό, το ακριβές πεδίο και ασφαλή εξήγηση αντίκτυπου"), p("Only a claim that the host is rooted", "Μόνο τον ισχυρισμό ότι ο host έγινε root"), p("A password copied from another system", "Κωδικό αντιγραμμένο από άλλο σύστημα"), p("Instructions to repeat it on public hosts", "Οδηγίες επανάληψης σε δημόσιους host")], 0, p("Clear evidence and boundaries make a finding reproducible and safe to remediate.", "Τα σαφή στοιχεία και όρια κάνουν το εύρημα επαναλήψιμο και ασφαλές για αποκατάσταση.")),
   ],
   "raven-recon": [
-    {
-      q: { en: "A boot2root box is designed to be…", el: "Ένα boot2root είναι σχεδιασμένο να είναι…" },
-      choices: [
-        { en: "A production bank", el: "Τράπεζα παραγωγής" },
-        { en: "A legal playground from scan to root", el: "Νόμιμο πεδίο από σάρωση ως root" },
-        { en: "A CDN", el: "CDN" },
-        { en: "An ISP core", el: "Πυρήνας ISP" },
-      ],
-      answer: 1,
-      why: { en: "CTF / lab machines exist so you never touch live systems.", el: "Τα CTF υπάρχουν για να μην αγγίζεις live συστήματα." },
-    },
-    {
-      q: { en: "Typical first step on a new box?", el: "Τυπικό πρώτο βήμα;" },
-      choices: [
-        { en: "Format the disk", el: "Format" },
-        { en: "Recon / port scan", el: "Recon / σάρωση θυρών" },
-        { en: "Email the CEO", el: "Email στον CEO" },
-        { en: "Buy zero-days", el: "Αγορά 0-days" },
-      ],
-      answer: 1,
-      why: { en: "Don't skip recon. You cannot exploit a service you have not found.", el: "Μην παραλείπεις recon." },
-    },
-    {
-      q: { en: "Raven in this lab speaks which services?", el: "Ο Raven μιλά ποιες υπηρεσίες;" },
-      choices: [
-        { en: "Only FTP", el: "Μόνο FTP" },
-        { en: "SSH and HTTP", el: "SSH και HTTP" },
-        { en: "Only RDP", el: "Μόνο RDP" },
-        { en: "SIP", el: "SIP" },
-      ],
-      answer: 1,
-      why: { en: "Your nmap -sV showed 22 and 80.", el: "Το nmap -sV έδειξε 22 και 80." },
-    },
+    q(p("You enter a new training host with no prior notes. What should your first pass establish?", "Μπαίνεις σε νέο host εκπαίδευσης χωρίς προηγούμενες σημειώσεις. Τι πρέπει να καθορίσει ο πρώτος έλεγχος;"), [p("Which in-scope services are reachable and what evidence identifies them", "Ποιες υπηρεσίες εντός πεδίου είναι προσβάσιμες και ποια στοιχεία τις αναγνωρίζουν"), p("Which passwords work on every account", "Ποιοι κωδικοί λειτουργούν σε κάθε λογαριασμό"), p("How to alter system logs", "Πώς να τροποποιήσεις τα logs συστήματος"), p("Whether the host can reach the public internet", "Αν ο host έχει πρόσβαση στο δημόσιο Internet")], 0, p("A methodical inventory gives context for safe, evidence-led follow-up.", "Μια μεθοδική απογραφή δίνει πλαίσιο για ασφαλή συνέχεια βασισμένη σε στοιχεία.")),
+    q(p("A simulated machine exposes a web service and a remote shell service. Which next action best preserves a disciplined workflow?", "Μια εικονική μηχανή εκθέτει web υπηρεσία και υπηρεσία απομακρυσμένου shell. Ποια επόμενη ενέργεια διατηρεί πειθαρχημένη ροή εργασίας;"), [p("Record the services and examine their public-facing evidence separately", "Κατέγραψε τις υπηρεσίες και εξέτασε χωριστά τα δημόσια στοιχεία τους"), p("Assume both services share one password", "Υπέθεσε ότι οι υπηρεσίες έχουν κοινό κωδικό"), p("Skip evidence collection and attempt administrator access", "Παράλειψε τη συλλογή στοιχείων και προσπάθησε πρόσβαση διαχειριστή"), p("Change the host configuration before documenting it", "Άλλαξε τις ρυθμίσεις του host πριν τις τεκμηριώσεις")], 0, p("Separate service observations help prioritize leads without mixing assumptions or changing evidence.", "Οι χωριστές παρατηρήσεις υπηρεσιών βοηθούν στην ιεράρχηση ενδείξεων χωρίς ανάμειξη υποθέσεων ή αλλοίωση στοιχείων.")),
+    q(p("A scan report includes an address outside the assigned lab range. What should you do?", "Μια αναφορά σάρωσης περιλαμβάνει διεύθυνση έξω από το εύρος του εργαστηρίου. Τι πρέπει να κάνεις;"), [p("Stop interaction with it and report the scope discrepancy", "Σταμάτησε την αλληλεπίδραση και ανέφερε την απόκλιση πεδίου"), p("Probe it more deeply to identify the owner", "Έλεγξέ την βαθύτερα για να βρεις τον ιδιοκτήτη"), p("Try credentials from the lab", "Δοκίμασε διαπιστευτήρια του εργαστηρίου"), p("Share the address with other learners", "Μοιράσου τη διεύθυνση με άλλους μαθητές")], 0, p("Out-of-scope results should not be pursued; notify the person responsible for the exercise.", "Τα αποτελέσματα εκτός πεδίου δεν πρέπει να ερευνώνται· ενημέρωσε τον υπεύθυνο της άσκησης.")),
   ],
   "raven-foothold": [
-    {
-      q: { en: "A foothold is…", el: "Foothold είναι…" },
-      choices: [
-        { en: "Root on day one, always", el: "Root την πρώτη μέρα" },
-        { en: "An initial working access (often a user shell)", el: "Αρχική πρόσβαση (συχνά user shell)" },
-        { en: "A firewall rule", el: "Κανόνας firewall" },
-        { en: "A SIEM alert", el: "Ειδοποίηση SIEM" },
-      ],
-      answer: 1,
-      why: { en: "Then you enumerate locally for privesc.", el: "Μετά τοπική απαρίθμηση για privesc." },
-    },
-    {
-      q: { en: "user.txt on a CTF box usually sits in…", el: "Το user.txt συνήθως είναι στο…" },
-      choices: [
-        { en: "/proc", el: "/proc" },
-        { en: "The low-priv user's home", el: "Το home του χαμηλού χρήστη" },
-        { en: "BIOS", el: "BIOS" },
-        { en: "The NTP pool", el: "NTP pool" },
-      ],
-      answer: 1,
-      why: { en: "Convention: /home/<user>/user.txt proves foothold.", el: "Σύμβαση: /home/<user>/user.txt." },
-    },
-    {
-      q: { en: "Why do CTF passwords appear in wordlists?", el: "Γιατί οι κωδικοί CTF είναι σε wordlists;" },
-      choices: [
-        { en: "To train the dictionary-attack lesson", el: "Για το μάθημα dictionary-attack" },
-        { en: "Because AES is broken", el: "Γιατί έσπασε το AES" },
-        { en: "Random chance", el: "Τύχη" },
-        { en: "IPv4 shortage", el: "Έλλειψη IPv4" },
-      ],
-      answer: 0,
-      why: { en: "They teach a pattern. Real systems must not reuse those words.", el: "Διδάσκουν μοτίβο. Τα πραγματικά συστήματα δεν πρέπει να τα επαναχρησιμοποιούν." },
-    },
+    q(p("You obtain a credential from a simulated configuration file. What is the safest next validation step?", "Βρίσκεις διαπιστευτήριο σε εικονικό αρχείο ρυθμίσεων. Ποιο είναι το ασφαλέστερο επόμενο βήμα επικύρωσης;"), [p("Use it only on the explicitly authorized service and account", "Χρησιμοποίησέ το μόνο στην ρητά εξουσιοδοτημένη υπηρεσία και στον λογαριασμό"), p("Try it against unrelated public sites", "Δοκίμασέ το σε άσχετους δημόσιους ιστότοπους"), p("Post it in the team chat", "Ανάρτησέ το στην ομαδική συνομιλία"), p("Assume it grants administrator rights", "Υπέθεσε ότι δίνει δικαιώματα διαχειριστή")], 0, p("Credential reuse can be a lead, but validation must remain inside the lab boundary and use the minimum necessary access.", "Η επαναχρησιμοποίηση διαπιστευτηρίων είναι ένδειξη, αλλά η επικύρωση πρέπει να μένει στα όρια του εργαστηρίου και να χρησιμοποιεί ελάχιστη πρόσβαση.")),
+    q(p("A successful login gives you a regular user shell. What has been demonstrated?", "Μια επιτυχής σύνδεση σου δίνει shell απλού χρήστη. Τι έχει αποδειχθεί;"), [p("An initial foothold for that account, not administrator control", "Αρχική πρόσβαση για τον συγκεκριμένο λογαριασμό, όχι έλεγχο διαχειριστή"), p("Complete control of every machine", "Πλήρης έλεγχος κάθε μηχανήματος"), p("That the account owner is the attacker", "Ότι ο ιδιοκτήτης του λογαριασμού είναι ο επιτιθέμενος"), p("That all stored backups are trustworthy", "Ότι όλα τα αποθηκευμένα αντίγραφα είναι αξιόπιστα")], 0, p("A foothold identifies the access level actually obtained; privilege and impact need separate verification.", "Η αρχική πρόσβαση προσδιορίζει το επίπεδο που αποκτήθηκε· δικαιώματα και αντίκτυπος χρειάζονται ξεχωριστή επιβεβαίωση.")),
+    q(p("A reused password appears in two training artifacts. What defensive action is most important after the exercise?", "Ένας επαναχρησιμοποιημένος κωδικός εμφανίζεται σε δύο τεκμήρια εκπαίδευσης. Ποια αμυντική ενέργεια είναι σημαντικότερη μετά την άσκηση;"), [p("Rotate the exposed secret and check other authorized uses", "Άλλαξε το εκτεθειμένο μυστικό και έλεγξε άλλες εξουσιοδοτημένες χρήσεις"), p("Keep using it because it worked", "Συνέχισε να το χρησιμοποιείς επειδή λειτούργησε"), p("Remove only the visible note", "Αφαίρεσε μόνο τη σημείωση που φαίνεται"), p("Disable account auditing", "Απενεργοποίησε τον έλεγχο λογαριασμών")], 0, p("Removing a copy does not invalidate a leaked credential; rotation and scoped review address the continuing risk.", "Η αφαίρεση ενός αντιγράφου δεν ακυρώνει διαρρεύσαν διαπιστευτήριο· η αλλαγή και ο στοχευμένος έλεγχος μειώνουν τον κίνδυνο.")),
   ],
   "raven-web": [
-    {
-      q: { en: "Why loot /var/www/html/config.php?", el: "Γιατί το config.php;" },
-      choices: [
-        { en: "It is pretty", el: "Είναι όμορφο" },
-        { en: "App configs often store DB credentials", el: "Συχνά έχει διαπιστευτήρια βάσης" },
-        { en: "PHP cannot run without being read", el: "Η PHP δεν τρέχει αλλιώς" },
-        { en: "It disables ASLR", el: "Κλείνει ASLR" },
-      ],
-      answer: 1,
-      why: { en: "Secrets in web roots are a classic finding.", el: "Μυστικά στο web root είναι κλασικό εύρημα." },
-    },
-    {
-      q: { en: "SQL dumps in /var/backups are dangerous because…", el: "Τα SQL dumps στο /var/backups είναι επικίνδυνα γιατί…" },
-      choices: [
-        { en: "They slow cron", el: "Αργό cron" },
-        { en: "They often contain users, hashes, PII", el: "Έχουν χρήστες, hashes, PII" },
-        { en: "They use UTF-16", el: "UTF-16" },
-        { en: "tar is illegal", el: "Το tar είναι παράνομο" },
-      ],
-      answer: 1,
-      why: { en: "Encrypt backups and restrict who can read them.", el: "Κρυπτογράφηση backups και περιορισμένη ανάγνωση." },
-    },
-    {
-      q: { en: "crontab running a user-writable script as root is…", el: "crontab με εγγράψιμο script ως root είναι…" },
-      choices: [
-        { en: "A hardening win", el: "Νίκη hardening" },
-        { en: "A privilege-escalation footgun", el: "Όπλο privesc" },
-        { en: "Required by PCI", el: "Απαίτηση PCI" },
-        { en: "Unrelated to security", el: "Άσχετο" },
-      ],
-      answer: 1,
-      why: { en: "If I can edit what root executes, I am root.", el: "Αν επεξεργάζομαι ό,τι εκτελεί ο root, είμαι root." },
-    },
+    q(p("A web configuration artifact contains a database username and secret. Which response best reduces exposure?", "Ένα τεκμήριο web ρυθμίσεων περιέχει όνομα χρήστη βάσης και μυστικό. Ποια αντίδραση μειώνει καλύτερα την έκθεση;"), [p("Restrict access, rotate the secret, and review where it was reused", "Περιόρισε την πρόσβαση, άλλαξε το μυστικό και έλεγξε πού επαναχρησιμοποιήθηκε"), p("Copy the secret into a public report", "Αντέγραψε το μυστικό σε δημόσια αναφορά"), p("Assume the database is already compromised", "Υπέθεσε ότι η βάση έχει ήδη παραβιαστεί"), p("Delete the evidence before recording it", "Διέγραψε τα στοιχεία πριν τα καταγράψεις")], 0, p("Treat exposed credentials as compromised, preserve relevant evidence, and rotate them through the owner-approved process.", "Αντιμετώπισε εκτεθειμένα διαπιστευτήρια ως παραβιασμένα, διατήρησε τα σχετικά στοιχεία και άλλαξέ τα με εγκεκριμένη διαδικασία.")),
+    q(p("A backup database contains a suspicious account record. What can that record establish on its own?", "Ένα αντίγραφο βάσης περιέχει ύποπτη εγγραφή λογαριασμού. Τι μπορεί να αποδείξει από μόνο του;"), [p("That the record exists in this backup artifact", "Ότι η εγγραφή υπάρχει σε αυτό το αντίγραφο"), p("Who created the account", "Ποιος δημιούργησε τον λογαριασμό"), p("That the account was used successfully", "Ότι ο λογαριασμός χρησιμοποιήθηκε επιτυχώς"), p("That the live database has the same current contents", "Ότι η ενεργή βάση έχει το ίδιο σημερινό περιεχόμενο")], 0, p("A backup is a point-in-time artifact; attribution and current state require corroborating evidence.", "Το αντίγραφο είναι τεκμήριο συγκεκριμένης χρονικής στιγμής· απόδοση ευθύνης και τρέχουσα κατάσταση χρειάζονται επιβεβαίωση.")),
+    q(p("During a web assessment you find an unexpected database export. What is the professional next step?", "Σε αξιολόγηση web βρίσκεις απρόσμενη εξαγωγή βάσης. Ποιο είναι το επαγγελματικό επόμενο βήμα;"), [p("Record its location and limited evidence, then follow the agreed reporting path", "Κατέγραψε την τοποθεσία και τα ελάχιστα απαραίτητα στοιχεία και ακολούθησε τη συμφωνημένη αναφορά"), p("Download every record to prove impact", "Κατέβασε όλες τις εγγραφές για να αποδείξεις αντίκτυπο"), p("Publish it so others can inspect it", "Δημοσίευσέ την για να την εξετάσουν άλλοι"), p("Modify the export to test write access", "Τροποποίησε την εξαγωγή για να ελέγξεις εγγραφή")], 0, p("Collect only what the authorization permits and avoid unnecessary exposure of personal or sensitive data.", "Συγκέντρωσε μόνο ό,τι επιτρέπει η άδεια και απόφυγε την άσκοπη έκθεση προσωπικών ή ευαίσθητων δεδομένων.")),
   ],
   "raven-root": [
-    {
-      q: { en: "World-writable + executed by root equals…", el: "World-writable + εκτέλεση από root =" },
-      choices: [
-        { en: "Secure by default", el: "Ασφαλές by default" },
-        { en: "Game over for the box", el: "Game over για το κουτί" },
-        { en: "Faster backups", el: "Ταχύτερα backups" },
-        { en: "A SELinux success", el: "Επιτυχία SELinux" },
-      ],
-      answer: 1,
-      why: { en: "Lock modes to 750/640 owned by root.", el: "Κλείδωσε modes 750/640 owned by root." },
-    },
-    {
-      q: { en: "root.txt conventionally proves…", el: "Το root.txt αποδεικνύει…" },
-      choices: [
-        { en: "You rebooted", el: "Κάνεις reboot" },
-        { en: "You achieved root on the box", el: "Πέτυχες root" },
-        { en: "DNS works", el: "Δουλεύει το DNS" },
-        { en: "IPv6 is on", el: "IPv6 on" },
-      ],
-      answer: 1,
-      why: { en: "That's the boot2root finish line.", el: "Η γραμμή τερματισμού boot2root." },
-    },
-    {
-      q: { en: "After rooting a lab, you should…", el: "Μετά το root σε lab πρέπει…" },
-      choices: [
-        { en: "Attack the next random IP you know", el: "Χτυπήσεις την επόμενη τυχαία IP" },
-        { en: "Write notes and stay inside authorised scope", el: "Σημειώσεις και παραμονή στο scope" },
-        { en: "Post real customer data", el: "Δημοσιεύσεις δεδομένα πελατών" },
-        { en: "Disable all logging everywhere", el: "Κλείσεις όλα τα logs" },
-      ],
-      answer: 1,
-      why: { en: "The oath still holds when you are good at this.", el: "Ο όρκος ισχύει και όταν είσαι καλός." },
-    },
+    q(p("A scheduled privileged process reads a script that ordinary users can modify. What is the central risk?", "Μια προγραμματισμένη προνομιούχα διεργασία διαβάζει script που μπορούν να τροποποιήσουν απλοί χρήστες. Ποιος είναι ο βασικός κίνδυνος;"), [p("Untrusted edits may execute with the scheduled process's authority", "Μη έμπιστες αλλαγές μπορεί να εκτελεστούν με τα δικαιώματα της διεργασίας"), p("The schedule will stop permanently", "Ο προγραμματισμός θα σταματήσει μόνιμα"), p("The script becomes encrypted automatically", "Το script κρυπτογραφείται αυτόματα"), p("Only the file's name can be changed", "Μπορεί να αλλάξει μόνο το όνομα του αρχείου")], 0, p("A privileged consumer must not trust content that lower-privilege users can alter.", "Μια προνομιούχα διεργασία δεν πρέπει να εμπιστεύεται περιεχόμενο που μπορούν να αλλάξουν χρήστες χαμηλότερων δικαιωμάτων.")),
+    q(p("A training marker is found in the administrator's protected folder. What does it demonstrate?", "Βρίσκεται εκπαιδευτικός δείκτης στον προστατευμένο φάκελο διαχειριστή. Τι αποδεικνύει;"), [p("That the simulated session could read that marker", "Ότι η εικονική συνεδρία μπόρεσε να διαβάσει τον δείκτη"), p("That every production system is compromised", "Ότι κάθε production σύστημα έχει παραβιαστεί"), p("That the administrator's password is known", "Ότι είναι γνωστός ο κωδικός διαχειριστή"), p("That the evidence has a valid chain of custody", "Ότι τα στοιχεία έχουν έγκυρη αλυσίδα φύλαξης")], 0, p("A lab marker confirms only the demonstrated access in that simulated environment.", "Ένας δείκτης εργαστηρίου επιβεβαιώνει μόνο την πρόσβαση που αποδείχθηκε στο εικονικό περιβάλλον.")),
+    q(p("After confirming an unsafe privileged script path, which remediation order is most appropriate?", "Αφού επιβεβαιώσεις μη ασφαλή διαδρομή προνομιούχου script, ποια σειρά αποκατάστασης είναι καταλληλότερη;"), [p("Preserve evidence, remove untrusted write access, review logs, and rotate exposed secrets", "Διατήρησε στοιχεία, αφαίρεσε μη έμπιστη εγγραφή, έλεγξε logs και άλλαξε εκτεθειμένα μυστικά"), p("Delete all logs and leave permissions unchanged", "Διέγραψε όλα τα logs και άφησε τα δικαιώματα ως έχουν"), p("Grant write access to more accounts", "Δώσε δικαίωμα εγγραφής σε περισσότερους λογαριασμούς"), p("Publish the host details before notifying its owner", "Δημοσίευσε τα στοιχεία του host πριν ενημερώσεις τον ιδιοκτήτη")], 0, p("Contain the unsafe path while preserving audit evidence and addressing possible credential exposure.", "Περιόρισε τη μη ασφαλή διαδρομή διατηρώντας τα στοιχεία ελέγχου και αντιμετωπίζοντας πιθανή έκθεση διαπιστευτηρίων.")),
   ],
   "ssh-keys": [
-    {
-      q: { en: "Private SSH keys should be mode…", el: "Τα ιδιωτικά κλειδιά SSH πρέπει να είναι…" },
-      choices: [
-        { en: "777", el: "777" },
-        { en: "600 (owner read/write only)", el: "600 (μόνο ο ιδιοκτήτης)" },
-        { en: "644", el: "644" },
-        { en: "000", el: "000" },
-      ],
-      answer: 1,
-      why: { en: "ssh refuses keys that are group/world-readable.", el: "Το ssh αρνείται κλειδιά αναγνώσιμα από άλλους." },
-    },
-    {
-      q: { en: "~/.ssh/config Host stanzas let you…", el: "Τα Host στο config σου επιτρέπουν…" },
-      choices: [
-        { en: "Mine crypto", el: "Mining" },
-        { en: "Alias hostnames, users, keys, ProxyJump", el: "Alias, users, keys, ProxyJump" },
-        { en: "Bypass MFA always", el: "Παράκαμψη MFA" },
-        { en: "Open SMTP", el: "SMTP" },
-      ],
-      answer: 1,
-      why: { en: "Config turns ugly one-liners into ssh jump.", el: "Το config κάνει ssh jump αντί για one-liners." },
-    },
-    {
-      q: { en: "ssh -i file specifies…", el: "Το ssh -i file ορίζει…" },
-      choices: [
-        { en: "An identity (private key) file", el: "Αρχείο ταυτότητας (ιδιωτικό κλειδί)" },
-        { en: "An iptables rule", el: "Κανόνα iptables" },
-        { en: "Idle timeout", el: "Idle timeout" },
-        { en: "IPv6 only", el: "Μόνο IPv6" },
-      ],
-      answer: 0,
-      why: { en: "-i identity_file.", el: "-i identity_file." },
-    },
+    q(p("A private authentication key is stored in a shared project folder. What is the best immediate response?", "Ένα ιδιωτικό κλειδί ταυτοποίησης αποθηκεύεται σε κοινόχρηστο φάκελο έργου. Ποια είναι η καλύτερη άμεση αντίδραση;"), [p("Treat it as exposed, restrict access, and rotate or revoke it", "Θεώρησέ το εκτεθειμένο, περιόρισε πρόσβαση και άλλαξε ή ανακάλεσέ το"), p("Share it with every teammate for convenience", "Μοιράσου το με όλη την ομάδα για ευκολία"), p("Rename it and assume it is safe", "Μετονόμασέ το και υπέθεσε ότι είναι ασφαλές"), p("Add it to a public repository", "Πρόσθεσέ το σε δημόσιο repository")], 0, p("A private key is a credential. Moving or renaming it does not revoke copies already made.", "Ένα ιδιωτικό κλειδί είναι διαπιστευτήριο. Η μετακίνηση ή μετονομασία δεν ανακαλεί αντίγραφα που έχουν ήδη γίνει.")),
+    q(p("A connection profile defines a host alias, user, and key file. What is its main benefit?", "Ένα προφίλ σύνδεσης ορίζει ψευδώνυμο host, χρήστη και αρχείο κλειδιού. Ποιο είναι το βασικό όφελος;"), [p("It centralizes connection choices and reduces repeated manual setup", "Συγκεντρώνει τις επιλογές σύνδεσης και μειώνει τις επαναλαμβανόμενες ρυθμίσεις"), p("It makes the private key public", "Κάνει δημόσιο το ιδιωτικό κλειδί"), p("It bypasses server authorization", "Παρακάμπτει την εξουσιοδότηση διακομιστή"), p("It encrypts every file on the host", "Κρυπτογραφεί κάθε αρχείο στον host")], 0, p("A connection profile is configuration convenience; the server still decides whether the identity is authorized.", "Το προφίλ σύνδεσης διευκολύνει τις ρυθμίσεις· ο διακομιστής εξακολουθεί να αποφασίζει αν η ταυτότητα είναι εξουσιοδοτημένη.")),
+    q(p("A public key appears in a server's authorized-key list. Which statement is correct?", "Ένα δημόσιο κλειδί εμφανίζεται στη λίστα εξουσιοδοτημένων κλειδιών διακομιστή. Ποια δήλωση είναι σωστή;"), [p("It can identify an accepted key, but the matching private key must remain protected", "Μπορεί να αναγνωρίζει αποδεκτό κλειδί, αλλά το αντίστοιχο ιδιωτικό πρέπει να προστατεύεται"), p("It proves the account owner personally approved every login", "Αποδεικνύει ότι ο ιδιοκτήτης ενέκρινε προσωπικά κάθε σύνδεση"), p("It contains the user's password in reversible form", "Περιέχει τον κωδικό χρήστη σε αναστρέψιμη μορφή"), p("It grants access to every host on the network", "Παρέχει πρόσβαση σε κάθε host του δικτύου")], 0, p("The public half is installed for verification; security depends on protecting the corresponding private credential and reviewing authorization.", "Το δημόσιο κλειδί εγκαθίσταται για επαλήθευση· η ασφάλεια εξαρτάται από την προστασία του ιδιωτικού και τον έλεγχο εξουσιοδότησης.")),
   ],
   "ssh-hop": [
-    {
-      q: { en: "ProxyJump (-J) is used to…", el: "Το ProxyJump (-J) χρησιμεύει για…" },
-      choices: [
-        { en: "Jump through a bastion to an internal host", el: "Πέρασμα από bastion σε εσωτερικό host" },
-        { en: "Upgrade RAM", el: "Αναβάθμιση RAM" },
-        { en: "Disable keys", el: "Απενεργοποίηση κλειδιών" },
-        { en: "Scan /24s faster", el: "Ταχύτερη σάρωση /24" },
-      ],
-      answer: 0,
-      why: { en: "ssh -J bastion user@internal", el: "ssh -J bastion user@internal" },
-    },
-    {
-      q: { en: "Bastion hosts should have…", el: "Τα bastion πρέπει να έχουν…" },
-      choices: [
-        { en: "Wide outbound any/any", el: "Ελεύθερο outbound" },
-        { en: "MFA, monitoring, tight egress", el: "MFA, monitoring, σφιχτό egress" },
-        { en: "Telnet enabled", el: "Telnet" },
-        { en: "Shared root passwords on sticky notes", el: "Κωδικό root σε χαρτάκι" },
-      ],
-      answer: 1,
-      why: { en: "A bastion is a high-value choke point. Treat it like one.", el: "Το bastion είναι σημείο ελέγχου υψηλής αξίας." },
-    },
-    {
-      q: { en: "Pivoting through SSH is relevant to defenders because…", el: "Το SSH pivot αφορά τους defenders γιατί…" },
-      choices: [
-        { en: "East-west SSH after a phish is a common path", el: "Το east-west SSH μετά από phish είναι κοινό" },
-        { en: "SSH cannot be logged", el: "Το SSH δεν λογαριάζεται" },
-        { en: "Firewalls ignore 22", el: "Τα firewall αγνοούν τη 22" },
-        { en: "It is layer 8 only", el: "Είναι μόνο layer 8" },
-      ],
-      answer: 0,
-      why: { en: "Watch unusual SSH graphs, not just the perimeter.", el: "Παρακολούθησε ασυνήθιστα γραφήματα SSH." },
-    },
+    q(p("An internal development host can only be reached through an approved bastion. What role does the bastion play?", "Ένας εσωτερικός development host είναι προσβάσιμος μόνο μέσω εγκεκριμένου bastion. Ποιος είναι ο ρόλος του bastion;"), [p("A controlled intermediate point for access into a restricted network", "Ελεγχόμενο ενδιάμεσο σημείο πρόσβασης σε περιορισμένο δίκτυο"), p("A guarantee that the internal host is trustworthy", "Εγγύηση ότι ο εσωτερικός host είναι αξιόπιστος"), p("A replacement for identity checks", "Αντικατάσταση ελέγχων ταυτότητας"), p("A way to remove authentication logs", "Τρόπος αφαίρεσης logs ταυτοποίησης")], 0, p("A bastion can constrain and record access, but it does not make downstream systems inherently safe.", "Ένα bastion μπορεί να περιορίζει και να καταγράφει πρόσβαση, αλλά δεν κάνει αυτόματα ασφαλή τα επόμενα συστήματα.")),
+    q(p("An analyst reaches a development host by passing through a bastion. Which record set is most useful during an investigation?", "Ένας αναλυτής φτάνει σε development host μέσω bastion. Ποια σύνολα καταγραφών είναι χρησιμότερα σε έρευνα;"), [p("Correlated authentication and session records from both systems", "Συσχετισμένα logs ταυτοποίησης και συνεδρίας και από τα δύο συστήματα"), p("Only the analyst's local shell history", "Μόνο το τοπικό ιστορικό shell του αναλυτή"), p("A screenshot of the desktop wallpaper", "Στιγμιότυπο της ταπετσαρίας"), p("The public DNS cache alone", "Μόνο η δημόσια cache DNS")], 0, p("A pivot crosses multiple trust boundaries, so correlate timestamps and identities at each hop.", "Η διέλευση περνά από πολλαπλά όρια εμπιστοσύνης, γι’ αυτό συσχέτισε χρόνους και ταυτότητες σε κάθε στάδιο.")),
+    q(p("A bastion is compromised. Why might this increase risk to internal systems?", "Ένα bastion έχει παραβιαστεί. Γιατί μπορεί να αυξηθεί ο κίνδυνος για εσωτερικά συστήματα;"), [p("It may expose credentials or routes used to reach restricted hosts", "Μπορεί να εκθέσει διαπιστευτήρια ή διαδρομές προς περιορισμένους host"), p("It automatically patches every internal host", "Ενημερώνει αυτόματα κάθε εσωτερικό host"), p("It removes network segmentation", "Αφαιρεί τον διαχωρισμό δικτύου"), p("It proves the internal hosts are unaffected", "Αποδεικνύει ότι οι εσωτερικοί host δεν επηρεάστηκαν")], 0, p("Intermediate systems often hold privileged paths, so their compromise should trigger scoped review of downstream access.", "Τα ενδιάμεσα συστήματα συχνά διαθέτουν προνομιούχες διαδρομές· η παραβίασή τους απαιτεί στοχευμένο έλεγχο επόμενης πρόσβασης.")),
   ],
   "ssh-tunnel": [
-    {
-      q: { en: "Network segmentation means…", el: "Segmentation σημαίνει…" },
-      choices: [
-        { en: "One flat VLAN for all", el: "Ένα VLAN για όλους" },
-        { en: "Not every host can reach every other host", el: "Δεν φτάνει κάθε host σε κάθε άλλον" },
-        { en: "No logging", el: "Χωρίς logs" },
-        { en: "Public IPs on printers", el: "Public IP σε εκτυπωτές" },
-      ],
-      answer: 1,
-      why: { en: "db-int was invisible from kali — that's the point.", el: "Το db-int ήταν αόρατο από kali." },
-    },
-    {
-      q: { en: "ssh -L is a…", el: "Το ssh -L είναι…" },
-      choices: [
-        { en: "Local port forward", el: "Τοπικό port forward" },
-        { en: "Linux kernel module", el: "Κερνελ module" },
-        { en: "LDAP bind", el: "LDAP bind" },
-        { en: "Lost packet counter", el: "Μετρητής lost packets" },
-      ],
-      answer: 0,
-      why: { en: "It maps localhost:port to a remote service through the SSH hop.", el: "Χαρτογραφεί localhost:port σε απομακρυσμένη υπηρεσία." },
-    },
-    {
-      q: { en: "A dual-homed host is a pivot because…", el: "Dual-homed host είναι pivot γιατί…" },
-      choices: [
-        { en: "It sits on more than one network", el: "Κάθεται σε περισσότερα δίκτυα" },
-        { en: "It has two keyboards", el: "Έχει δύο πληκτρολόγια" },
-        { en: "It uses RAID 0", el: "RAID 0" },
-        { en: "It is always root", el: "Είναι πάντα root" },
-      ],
-      answer: 0,
-      why: { en: "Compromise it and you inherit its routes.", el: "Αν το παραβιάσεις, κληρονομείς τις διαδρομές του." },
-    },
+    q(p("An engineer maps a local listening port to a service reachable only from a remote host. What has been created?", "Ένας μηχανικός αντιστοιχίζει τοπική θύρα σε υπηρεσία προσβάσιμη μόνο από απομακρυσμένο host. Τι έχει δημιουργηθεί;"), [p("A local port-forwarding tunnel", "Σήραγγα τοπικής προώθησης θύρας"), p("A new user account", "Νέος λογαριασμός χρήστη"), p("A forensic disk image", "Forensic image δίσκου"), p("A DNS zone transfer", "Μεταφορά ζώνης DNS")], 0, p("Port forwarding carries traffic through an authenticated connection to a service on the far side.", "Η προώθηση θύρας μεταφέρει κίνηση μέσω ταυτοποιημένης σύνδεσης προς υπηρεσία στην απέναντι πλευρά.")),
+    q(p("A database is intentionally unreachable from user networks but reachable from an application subnet. What does this design provide?", "Μια βάση δεν είναι προσβάσιμη από δίκτυα χρηστών αλλά είναι προσβάσιμη από subnet εφαρμογής. Τι προσφέρει αυτός ο σχεδιασμός;"), [p("Network segmentation that narrows direct access", "Διαχωρισμό δικτύου που περιορίζει την άμεση πρόσβαση"), p("Proof that the database has no vulnerabilities", "Απόδειξη ότι η βάση δεν έχει ευπάθειες"), p("Automatic encryption of all database records", "Αυτόματη κρυπτογράφηση όλων των εγγραφών"), p("A guarantee that application credentials cannot leak", "Εγγύηση ότι δεν θα διαρρεύσουν διαπιστευτήρια εφαρμογής")], 0, p("Segmentation limits which systems can connect; it does not replace authentication, patching, or monitoring.", "Ο διαχωρισμός περιορίζει ποια συστήματα συνδέονται· δεν αντικαθιστά ταυτοποίηση, ενημερώσεις ή παρακολούθηση.")),
+    q(p("A security team sees an unexpected tunnel to an internal service. What is the best defensive response?", "Μια ομάδα ασφαλείας βλέπει απρόσμενη σήραγγα προς εσωτερική υπηρεσία. Ποια είναι η καλύτερη αμυντική αντίδραση;"), [p("Validate the owner and purpose, preserve session evidence, and restrict unauthorized forwarding", "Επιβεβαίωσε υπεύθυνο και σκοπό, διατήρησε στοιχεία συνεδρίας και περιόρισε μη εξουσιοδοτημένη προώθηση"), p("Assume every tunnel is malicious and erase all logs", "Υπέθεσε ότι κάθε σήραγγα είναι κακόβουλη και διέγραψε όλα τα logs"), p("Publish the internal service address", "Δημοσίευσε τη διεύθυνση της εσωτερικής υπηρεσίας"), p("Disable all network monitoring", "Απενεργοποίησε όλη την παρακολούθηση δικτύου")], 0, p("Tunnels can be legitimate or risky; investigate context and enforce approved access paths.", "Οι σήραγγες μπορεί να είναι νόμιμες ή επικίνδυνες· διερεύνησε το πλαίσιο και εφάρμοσε εγκεκριμένες διαδρομές.")),
   ],
   "sr-intro": [
-    { q: { en: "pwd prints…", el: "Το pwd τυπώνει…" }, choices: [{ en: "Users", el: "Χρήστες" }, { en: "Working directory", el: "Τρέχοντα φάκελο" }, { en: "Processes", el: "Διεργασίες" }, { en: "IPs", el: "IP" }], answer: 1, why: { en: "print working directory", el: "print working directory" } },
-    { q: { en: "whoami as root means…", el: "whoami ως root σημαίνει…" }, choices: [{ en: "Guest", el: "Guest" }, { en: "Full administrator on this box", el: "Πλήρης διαχειριστής" }, { en: "FTP only", el: "Μόνο FTP" }, { en: "No privileges", el: "Χωρίς προνόμια" }], answer: 1, why: { en: "root is the superuser.", el: "root = superuser." } },
-    { q: { en: "ls is closest to Windows…", el: "Το ls μοιάζει με…" }, choices: [{ en: "dir", el: "dir" }, { en: "ipconfig", el: "ipconfig" }, { en: "taskmgr", el: "taskmgr" }, { en: "notepad", el: "notepad" }], answer: 0, why: { en: "ls lists directory contents.", el: "Το ls λιστάρει." } },
+    q(p("A support note gives a relative file location, but you are unsure which folder your session is using. What should you establish first?", "Μια σημείωση υποστήριξης δίνει σχετική τοποθεσία αρχείου, αλλά δεν γνωρίζεις σε ποιον φάκελο βρίσκεσαι. Τι πρέπει να εξακριβώσεις πρώτα;"), [p("Your current working directory", "Τον τρέχοντα φάκελο εργασίας"), p("The public IP of the organization", "Τη δημόσια IP του οργανισμού"), p("The file's color in the terminal", "Το χρώμα του αρχείου στο τερματικό"), p("The latest package release", "Την πιο πρόσφατη έκδοση πακέτου")], 0, p("Relative locations depend on where the session is positioned.", "Οι σχετικές τοποθεσίες εξαρτώνται από το σημείο στο οποίο βρίσκεται η συνεδρία.")),
+    q(p("A process reports that its current account is the superuser. What does that imply?", "Μια διεργασία αναφέρει ότι ο τρέχων λογαριασμός είναι superuser. Τι σημαίνει αυτό;"), [p("It has broad administrative authority on that host", "Έχει ευρεία εξουσία διαχείρισης σε εκείνον τον host"), p("It has access to every network worldwide", "Έχει πρόσβαση σε κάθε δίκτυο παγκοσμίως"), p("It is an ordinary guest session", "Είναι απλή συνεδρία επισκέπτη"), p("It is running inside a browser", "Εκτελείται σε πρόγραμμα περιήγησης")], 0, p("The superuser can bypass many local permission checks, so actions require particular care.", "Ο superuser μπορεί να παρακάμπτει πολλούς τοπικούς ελέγχους δικαιωμάτων, άρα οι ενέργειες απαιτούν ιδιαίτερη προσοχή.")),
+    q(p("A new learner wants a quick overview of a directory before opening individual files. What kind of information is most useful first?", "Ένας νέος μαθητής θέλει γρήγορη εικόνα ενός φακέλου πριν ανοίξει αρχεία. Ποια πληροφορία είναι χρησιμότερη αρχικά;"), [p("Names and basic metadata of its entries", "Ονόματα και βασικά μεταδεδομένα των εγγραφών"), p("The contents of every remote database", "Το περιεχόμενο κάθε απομακρυσμένης βάσης"), p("The administrator's private key", "Το ιδιωτικό κλειδί διαχειριστή"), p("The machine's full memory image", "Πλήρες image μνήμης του υπολογιστή")], 0, p("A directory overview provides orientation and helps choose what to inspect next.", "Η επισκόπηση φακέλου παρέχει προσανατολισμό και βοηθά να επιλέξεις τι θα εξετάσεις μετά.")),
   ],
   "sr-help": [
-    { q: { en: "man ls opens…", el: "man ls ανοίγει…" }, choices: [{ en: "A movie", el: "Ταινία" }, { en: "The ls manual page", el: "Το εγχειρίδιο ls" }, { en: "A firewall", el: "Firewall" }, { en: "apt", el: "apt" }], answer: 1, why: { en: "man = manual.", el: "man = εγχειρίδιο." } },
-    { q: { en: "which git returns…", el: "which git επιστρέφει…" }, choices: [{ en: "Every file named git", el: "Κάθε αρχείο git" }, { en: "The git binary on PATH", el: "Το binary στο PATH" }, { en: "GitHub", el: "GitHub" }, { en: "Nothing", el: "Τίποτα" }], answer: 1, why: { en: "which is PATH-only.", el: "which = μόνο PATH." } },
-    { q: { en: "locate's database is typically updated…", el: "Η βάση locate ενημερώνεται…" }, choices: [{ en: "Every millisecond", el: "Κάθε ms" }, { en: "About once a day", el: "Περίπου μία φορά τη μέρα" }, { en: "Never", el: "Ποτέ" }, { en: "On SSH login only", el: "Μόνο στο SSH" }], answer: 1, why: { en: "New files can be missing until updatedb.", el: "Νέα αρχεία λείπουν μέχρι updatedb." } },
+    q(p("You need to understand an unfamiliar utility before using it. Which reference is most likely to explain its supported options and behavior?", "Χρειάζεται να καταλάβεις άγνωστο βοηθητικό πρόγραμμα πριν το χρησιμοποιήσεις. Ποια αναφορά εξηγεί πιθανότερα επιλογές και συμπεριφορά;"), [p("Its maintained manual or built-in help", "Το ενημερωμένο εγχειρίδιο ή η ενσωματωμένη βοήθειά του"), p("A random filename in a cache", "Τυχαίο όνομα αρχείου σε cache"), p("A list of nearby wireless networks", "Λίστα κοντινών ασύρματων δικτύων"), p("The shell prompt color", "Το χρώμα του prompt")], 0, p("Official local documentation is a safer starting point than guessing at syntax.", "Η επίσημη τοπική τεκμηρίωση είναι ασφαλέστερη αφετηρία από εικασίες για σύνταξη.")),
+    q(p("A program name is available only when a particular search path is configured. What does that usually tell you?", "Ένα όνομα προγράμματος είναι διαθέσιμο μόνο όταν έχει ρυθμιστεί συγκεκριμένη διαδρομή αναζήτησης. Τι δείχνει συνήθως;"), [p("The shell resolves executable names using its configured search path", "Το shell εντοπίζει εκτελέσιμα ονόματα μέσω της ρυθμισμένης διαδρομής αναζήτησης"), p("The program is running as administrator", "Το πρόγραμμα εκτελείται ως διαχειριστής"), p("The program is stored in every user's home", "Το πρόγραμμα βρίσκεται στον προσωπικό φάκελο κάθε χρήστη"), p("The host has no filesystem", "Ο host δεν έχει σύστημα αρχείων")], 0, p("Search-path configuration affects which executable is selected; it says nothing by itself about trust or privilege.", "Η διαδρομή αναζήτησης επηρεάζει ποιο εκτελέσιμο επιλέγεται· δεν αποδεικνύει από μόνη της εμπιστοσύνη ή δικαιώματα.")),
+    q(p("A recently created document does not appear in a database-backed file index. What is the most likely explanation?", "Ένα πρόσφατα δημιουργημένο έγγραφο δεν εμφανίζεται σε ευρετήριο αρχείων με βάση δεδομένα. Ποια είναι η πιθανότερη εξήγηση;"), [p("The index may be stale and not yet refreshed", "Το ευρετήριο μπορεί να είναι παλιό και να μην έχει ανανεωθεί"), p("The document must be malicious", "Το έγγραφο πρέπει να είναι κακόβουλο"), p("The computer has changed its hostname", "Ο υπολογιστής άλλαξε όνομα"), p("The document is definitely encrypted", "Το έγγραφο είναι σίγουρα κρυπτογραφημένο")], 0, p("Indexed search can lag behind filesystem changes; confirm with a current, scoped inspection.", "Η αναζήτηση μέσω ευρετηρίου μπορεί να καθυστερεί σε σχέση με τις αλλαγές· επιβεβαίωσε με τρέχοντα, στοχευμένο έλεγχο.")),
   ],
   "sr-search": [
-    { q: { en: "ifconfig | grep inet keeps…", el: "ifconfig | grep inet κρατά…" }, choices: [{ en: "All lines", el: "Όλα" }, { en: "Lines containing inet", el: "Γραμμές με inet" }, { en: "Only errors", el: "Μόνο σφάλματα" }, { en: "PIDs", el: "PID" }], answer: 1, why: { en: "grep filters stdin.", el: "Το grep φιλτράρει stdin." } },
-    { q: { en: "find / -type f -name gamehack starts at…", el: "Το find / ξεκινά από…" }, choices: [{ en: "Your home only", el: "Μόνο home" }, { en: "The filesystem root", el: "Τη ρίζα" }, { en: "RAM", el: "RAM" }, { en: "DNS", el: "DNS" }], answer: 1, why: { en: "/ is the tree root.", el: "/ = ρίζα." } },
-    { q: { en: "2>&1 sends…", el: "Το 2>&1 στέλνει…" }, choices: [{ en: "stdout to a printer", el: "stdout σε εκτυπωτή" }, { en: "stderr to stdout", el: "stderr στο stdout" }, { en: "root mail", el: "mail root" }, { en: "Nothing", el: "Τίποτα" }], answer: 1, why: { en: "Merge streams so grep can filter errors.", el: "Ένωση ροών." } },
+    q(p("A stream of system information is followed by a text filter. What does the filter normally do?", "Μια ροή πληροφοριών συστήματος ακολουθείται από φίλτρο κειμένου. Τι κάνει συνήθως το φίλτρο;"), [p("Keeps only records matching the selected pattern", "Κρατά μόνο εγγραφές που ταιριάζουν στο επιλεγμένο μοτίβο"), p("Changes the original source file", "Αλλάζει το αρχικό αρχείο"), p("Restarts every service", "Επανεκκινεί κάθε υπηρεσία"), p("Encrypts the network connection", "Κρυπτογραφεί τη σύνδεση δικτύου")], 0, p("A filter narrows the displayed stream; it does not automatically alter the source evidence.", "Ένα φίλτρο περιορίζει την εμφανιζόμενη ροή· δεν αλλάζει αυτόματα την αρχική πηγή στοιχείων.")),
+    q(p("A recursive search from the filesystem root produces too much unrelated output. What is a better refinement?", "Μια αναδρομική αναζήτηση από τη ρίζα του συστήματος δίνει υπερβολικά πολλά άσχετα αποτελέσματα. Ποια είναι καλύτερη βελτίωση;"), [p("Choose the narrowest relevant starting directory and a useful criterion", "Επίλεξε τον στενότερο σχετικό φάκελο εκκίνησης και χρήσιμο κριτήριο"), p("Remove all filters and repeat it more often", "Αφαίρεσε όλα τα φίλτρα και επανάλαβέ την συχνότερα"), p("Search unrelated network hosts", "Ψάξε άσχετους host δικτύου"), p("Delete files that do not match", "Διέγραψε αρχεία που δεν ταιριάζουν")], 0, p("A scoped search is faster, easier to interpret, and less likely to expose unrelated data.", "Μια στοχευμένη αναζήτηση είναι ταχύτερη, ευκολότερη στην ερμηνεία και λιγότερο πιθανό να εκθέσει άσχετα δεδομένα.")),
+    q(p("A diagnostic message is written to the error stream rather than the normal output stream. Why might that matter when filtering results?", "Ένα διαγνωστικό μήνυμα γράφεται στη ροή σφαλμάτων αντί στην κανονική ροή εξόδου. Γιατί μπορεί να έχει σημασία κατά το φιλτράρισμα;"), [p("The two streams may need to be reviewed or handled separately", "Οι δύο ροές μπορεί να χρειάζονται χωριστή εξέταση ή διαχείριση"), p("The message is automatically a password", "Το μήνυμα είναι αυτόματα κωδικός"), p("The file permissions have changed", "Άλλαξαν τα δικαιώματα του αρχείου"), p("The process has become a network service", "Η διεργασία έγινε υπηρεσία δικτύου")], 0, p("Standard output and standard error are distinct streams, so a filter may not see diagnostic text unless it is handled deliberately.", "Η κανονική έξοδος και τα σφάλματα είναι ξεχωριστές ροές· ένα φίλτρο μπορεί να μη δει διαγνωστικό κείμενο αν δεν διαχειριστείς τις ροές.")),
   ],
   "sr-files": [
-    { q: { en: "touch creates…", el: "Το touch δημιουργεί…" }, choices: [{ en: "A user", el: "Χρήστη" }, { en: "An empty file", el: "Κενό αρχείο" }, { en: "A RAID", el: "RAID" }, { en: "A VLAN", el: "VLAN" }], answer: 1, why: { en: "touch NAME", el: "touch NAME" } },
-    { q: { en: "mv can…", el: "Το mv μπορεί…" }, choices: [{ en: "Only delete", el: "Μόνο διαγραφή" }, { en: "Move or rename", el: "Μετακίνηση ή μετονομασία" }, { en: "Format disks", el: "Format" }, { en: "Crack wifi", el: "Crack wifi" }], answer: 1, why: { en: "mv SRC DEST", el: "mv SRC DEST" } },
-    { q: { en: "rmdir fails when…", el: "Το rmdir αποτυγχάνει όταν…" }, choices: [{ en: "The dir has contents", el: "Ο φάκελος έχει περιεχόμενο" }, { en: "You are root", el: "Είσαι root" }, { en: "It is Monday", el: "Δευτέρα" }, { en: "IPv6 is on", el: "IPv6" }], answer: 0, why: { en: "Use rm -r for non-empty dirs.", el: "rm -r για μη άδειους." } },
+    q(p("A blank report must be prepared in a case folder. What is the key difference between creating a file and creating a directory?", "Πρέπει να ετοιμαστεί κενή αναφορά σε φάκελο υπόθεσης. Ποια είναι η βασική διαφορά μεταξύ δημιουργίας αρχείου και φακέλου;"), [p("A file stores content; a directory organizes entries", "Ένα αρχείο αποθηκεύει περιεχόμενο· ένας φάκελος οργανώνει εγγραφές"), p("A directory is always executable code", "Ένας φάκελος είναι πάντα εκτελέσιμος κώδικας"), p("A file automatically grants network access", "Ένα αρχείο παρέχει αυτόματα πρόσβαση δικτύου"), p("They are identical objects", "Είναι πανομοιότυπα αντικείμενα")], 0, p("Files and directories have different roles and different permission semantics.", "Τα αρχεία και οι φάκελοι έχουν διαφορετικό ρόλο και διαφορετική σημασία δικαιωμάτων.")),
+    q(p("A teammate needs a file moved into an archive folder while preserving the original name. What operation is needed?", "Ένας συνάδελφος χρειάζεται να μεταφερθεί αρχείο σε φάκελο αρχειοθέτησης με διατήρηση ονόματος. Ποια ενέργεια χρειάζεται;"), [p("Move the directory entry to the destination", "Μετακίνησε την εγγραφή του αρχείου στον προορισμό"), p("Change the file's owner to root", "Άλλαξε ιδιοκτήτη αρχείου σε root"), p("Rewrite its contents as a network address", "Ξαναγράψε το περιεχόμενό του ως διεύθυνση δικτύου"), p("Delete the parent filesystem", "Διέγραψε το γονικό σύστημα αρχείων")], 0, p("Moving changes where the entry appears; it need not change the file's contents.", "Η μετακίνηση αλλάζει τη θέση της εγγραφής· δεν χρειάζεται να αλλάξει το περιεχόμενο.")),
+    q(p("A cleanup tool refuses to remove a folder that still contains evidence. What is the safest response?", "Ένα εργαλείο καθαρισμού αρνείται να αφαιρέσει φάκελο που περιέχει ακόμη στοιχεία. Ποια είναι η ασφαλέστερη αντίδραση;"), [p("Review the contents and confirm retention or backup before removal", "Έλεγξε το περιεχόμενο και επιβεβαίωσε διατήρηση ή αντίγραφο πριν την αφαίρεση"), p("Force deletion without checking", "Εξαναγκάσε διαγραφή χωρίς έλεγχο"), p("Change every permission to writable", "Κάνε όλα τα δικαιώματα εγγράψιμα"), p("Upload the evidence publicly", "Ανέβασε τα στοιχεία δημόσια")], 0, p("A directory may contain needed data; inspect and preserve it before destructive cleanup.", "Ένας φάκελος μπορεί να περιέχει απαραίτητα δεδομένα· εξέτασέ τον και διατήρησέ τον πριν από καταστροφικό καθαρισμό.")),
   ],
   "sr-text": [
-    { q: { en: "head shows…", el: "Το head δείχνει…" }, choices: [{ en: "Last 10 lines by default", el: "Τελευταίες 10" }, { en: "First 10 lines by default", el: "Πρώτες 10" }, { en: "PIDs", el: "PID" }, { en: "MAC", el: "MAC" }], answer: 1, why: { en: "tail is the opposite.", el: "Το tail είναι το αντίθετο." } },
-    { q: { en: "sed s/WWW/www/g does…", el: "Το sed s/WWW/www/g…" }, choices: [{ en: "Deletes the file", el: "Σβήνει το αρχείο" }, { en: "Replaces WWW with www globally (on stdout)", el: "Αντικαθιστά WWW→www στην έξοδο" }, { en: "Starts apache", el: "Ανοίγει apache" }, { en: "Sets SUID", el: "SUID" }], answer: 1, why: { en: "/g = every occurrence. Redirect to write.", el: "/g = όλες. Redirect για εγγραφή." } },
-    { q: { en: "less vs more: less can…", el: "less vs more: το less μπορεί…" }, choices: [{ en: "Format ext4", el: "ext4" }, { en: "Search with / in a real TTY", el: "Αναζήτηση με /" }, { en: "Assign IPs", el: "IP" }, { en: "Compile C", el: "C" }], answer: 1, why: { en: "less is the nicer pager.", el: "Το less είναι καλύτερο pager." } },
+    q(p("An incident responder wants a quick look at the beginning of a long log. Which portion should be reviewed first?", "Ένας incident responder θέλει γρήγορη ματιά στην αρχή ενός μεγάλου log. Ποιο τμήμα πρέπει να εξεταστεί πρώτο;"), [p("The earliest lines", "Οι πρώτες γραμμές"), p("Only the final line", "Μόνο η τελευταία γραμμή"), p("The file's permission bits", "Τα bit δικαιωμάτων του αρχείου"), p("The network interface address", "Τη διεύθυνση διεπαφής δικτύου")], 0, p("A short preview of the beginning helps establish the log's format and earliest recorded context.", "Μια σύντομη προεπισκόπηση της αρχής βοηθά να κατανοήσεις τη μορφή και το παλαιότερο καταγεγραμμένο πλαίσιο.")),
+    q(p("A text transformation is used to replace a label in a report. What should you verify before overwriting the source?", "Χρησιμοποιείται μετασχηματισμός κειμένου για αλλαγή ετικέτας σε αναφορά. Τι πρέπει να ελέγξεις πριν αντικαταστήσεις την πηγή;"), [p("Review the transformed output and preserve an original copy", "Έλεγξε το μετασχηματισμένο αποτέλεσμα και διατήρησε πρωτότυπο αντίγραφο"), p("Whether the report is stored on a wireless network", "Αν η αναφορά βρίσκεται σε ασύρματο δίκτυο"), p("Whether the account has a public profile", "Αν ο λογαριασμός έχει δημόσιο προφίλ"), p("Whether the screen theme is light", "Αν το θέμα της οθόνης είναι φωτεινό")], 0, p("Text-processing output can be wrong or broader than intended; preserve the source and review changes.", "Η επεξεργασία κειμένου μπορεί να είναι λανθασμένη ή ευρύτερη από το προβλεπόμενο· διατήρησε την πηγή και έλεγξε τις αλλαγές.")),
+    q(p("A large text file is opened in a pager. Why is a pager useful?", "Ένα μεγάλο αρχείο κειμένου ανοίγει σε πρόγραμμα σελιδοποίησης. Γιατί είναι χρήσιμο;"), [p("It lets you inspect content incrementally without loading the whole file into one view", "Επιτρέπει σταδιακή εξέταση χωρίς να εμφανιστεί όλο το αρχείο μαζί"), p("It proves every line is authentic", "Αποδεικνύει ότι κάθε γραμμή είναι αυθεντική"), p("It encrypts the file automatically", "Κρυπτογραφεί αυτόματα το αρχείο"), p("It changes file ownership", "Αλλάζει τον ιδιοκτήτη αρχείου")], 0, p("A pager makes large text easier to navigate and inspect while leaving the source unchanged.", "Ένα pager κάνει τα μεγάλα κείμενα ευκολότερα στην πλοήγηση και εξέταση χωρίς αλλαγή της πηγής.")),
   ],
   "sr-apt": [
-    { q: { en: "apt-get update…", el: "apt-get update…" }, choices: [{ en: "Installs every package", el: "Εγκαθιστά όλα" }, { en: "Refreshes package indexes", el: "Ανανεώνει ευρετήρια" }, { en: "Deletes /", el: "Σβήνει /" }, { en: "Starts FTP", el: "FTP" }], answer: 1, why: { en: "upgrade applies the updates.", el: "Το upgrade εφαρμόζει." } },
-    { q: { en: "purge vs remove…", el: "purge vs remove…" }, choices: [{ en: "Same always", el: "Ίδια" }, { en: "purge also drops leftover configs", el: "Το purge καθαρίζει configs" }, { en: "purge installs more", el: "Εγκαθιστά περισσότερα" }, { en: "remove needs rootless", el: "χωρίς root" }], answer: 1, why: { en: "purge is the thorough uninstall.", el: "Το purge είναι πλήρες." } },
-    { q: { en: "sources.list lists…", el: "Το sources.list έχει…" }, choices: [{ en: "Users", el: "Χρήστες" }, { en: "Package repositories", el: "Αποθετήρια πακέτων" }, { en: "Cron jobs", el: "Cron" }, { en: "SSH keys", el: "SSH keys" }], answer: 1, why: { en: "Don't add random experimental repos.", el: "Όχι τυχαία experimental repos." } },
+    q(p("A software manager refreshes its repository metadata but installs no packages. What has happened?", "Ένας διαχειριστής λογισμικού ανανεώνει τα μεταδεδομένα αποθετηρίων χωρίς να εγκαταστήσει πακέτα. Τι συνέβη;"), [p("The local package index was refreshed", "Ανανεώθηκε το τοπικό ευρετήριο πακέτων"), p("Every installed application was upgraded", "Ενημερώθηκαν όλες οι εγκατεστημένες εφαρμογές"), p("The system was restored from backup", "Το σύστημα επανήλθε από αντίγραφο"), p("The network interface was disabled", "Απενεργοποιήθηκε η διεπαφή δικτύου")], 0, p("Refreshing indexes learns what versions are available; applying upgrades is a separate action.", "Η ανανέωση ευρετηρίων βρίσκει διαθέσιμες εκδόσεις· η εφαρμογή ενημερώσεων είναι ξεχωριστή ενέργεια.")),
+    q(p("A package is removed, but its local configuration remains. What distinction explains this?", "Ένα πακέτο αφαιρείται αλλά η τοπική ρύθμισή του παραμένει. Ποια διάκριση το εξηγεί;"), [p("Uninstalling software can differ from purging its configuration", "Η απεγκατάσταση λογισμικού διαφέρει από την πλήρη αφαίρεση ρυθμίσεων"), p("Repository metadata is a user account", "Τα μεταδεδομένα αποθετηρίου είναι λογαριασμός χρήστη"), p("The package manager changed the hostname", "Ο διαχειριστής πακέτων άλλαξε το hostname"), p("The service has become encrypted", "Η υπηρεσία κρυπτογραφήθηκε")], 0, p("Package removal often preserves configuration for a future reinstall; verify what data will remain.", "Η αφαίρεση πακέτου συχνά διατηρεί ρυθμίσεις για μελλοντική επανεγκατάσταση· έλεγξε τι θα παραμείνει.")),
+    q(p("A repository offers a tool from an unfamiliar source. What should an administrator verify before trusting it?", "Ένα αποθετήριο προσφέρει εργαλείο από άγνωστη πηγή. Τι πρέπει να επαληθεύσει ο διαχειριστής πριν το εμπιστευτεί;"), [p("The source's ownership, signing, and organizational approval", "Την ιδιοκτησία, υπογραφή και έγκριση του οργανισμού"), p("Whether the package name is short", "Αν το όνομα πακέτου είναι σύντομο"), p("Whether the package has a colorful icon", "Αν το πακέτο έχει πολύχρωμο εικονίδιο"), p("Whether other users have guessed its version", "Αν άλλοι χρήστες μάντεψαν την έκδοσή του")], 0, p("Package repositories are part of the software supply chain; verify provenance and trust before installation.", "Τα αποθετήρια αποτελούν μέρος της εφοδιαστικής αλυσίδας λογισμικού· επαλήθευσε προέλευση και εμπιστοσύνη πριν την εγκατάσταση.")),
   ],
   "sr-perms": [
-    { q: { en: "chmod 7 means…", el: "chmod 7 σημαίνει…" }, choices: [{ en: "---", el: "---" }, { en: "rwx", el: "rwx" }, { en: "r--", el: "r--" }, { en: "x only", el: "μόνο x" }], answer: 1, why: { en: "4+2+1 = rwx.", el: "4+2+1 = rwx." } },
-    { q: { en: "SUID is set with prefix…", el: "SUID με πρόθεμα…" }, choices: [{ en: "2", el: "2" }, { en: "4", el: "4" }, { en: "7", el: "7" }, { en: "0", el: "0" }], answer: 1, why: { en: "4644 = SUID + 644. 2xxx = SGID.", el: "4=SUID, 2=SGID." } },
-    { q: { en: "chown Raj file changes…", el: "chown Raj αλλάζει…" }, choices: [{ en: "The group only", el: "Μόνο ομάδα" }, { en: "The owner", el: "Τον ιδιοκτήτη" }, { en: "The kernel", el: "Το kernel" }, { en: "DNS", el: "DNS" }], answer: 1, why: { en: "chgrp changes group.", el: "chgrp = ομάδα." } },
+    q(p("A permission digit represents read, write, and execute capabilities combined for one class of users. What is the important lesson?", "Ένα ψηφίο δικαιωμάτων συνδυάζει ανάγνωση, εγγραφή και εκτέλεση για μία κατηγορία χρηστών. Ποιο είναι το σημαντικό μάθημα;"), [p("Each capability contributes separately, so grant only what is needed", "Κάθε δυνατότητα συνεισφέρει ξεχωριστά, άρα δώσε μόνο ό,τι χρειάζεται"), p("The highest digit is always safest", "Το μεγαλύτερο ψηφίο είναι πάντα ασφαλέστερο"), p("Permissions apply only to network addresses", "Τα δικαιώματα ισχύουν μόνο για διευθύνσεις δικτύου"), p("The owner and group are irrelevant", "Ο ιδιοκτήτης και η ομάδα είναι άσχετοι")], 0, p("Permission combinations should be chosen deliberately for owner, group, and other users.", "Οι συνδυασμοί δικαιωμάτων πρέπει να επιλέγονται σκόπιμα για ιδιοκτήτη, ομάδα και υπόλοιπους.")),
+    q(p("A file has a special bit that can make a program act with its owner's identity. What should a defender prioritize?", "Ένα αρχείο έχει ειδικό bit που επιτρέπει σε πρόγραμμα να ενεργεί με την ταυτότητα του ιδιοκτήτη. Τι πρέπει να ιεραρχήσει ο αμυνόμενος;"), [p("Confirm the file's purpose, owner, integrity, and necessity", "Επιβεβαίωσε σκοπό, ιδιοκτήτη, ακεραιότητα και αναγκαιότητα αρχείου"), p("Make every such file writable by all users", "Κάνε κάθε τέτοιο αρχείο εγγράψιμο από όλους"), p("Disable all account auditing", "Απενεργοποίησε όλους τους ελέγχους λογαριασμών"), p("Assume the bit is harmless on every program", "Υπέθεσε ότι το bit είναι ακίνδυνο σε κάθε πρόγραμμα")], 0, p("Special privilege bits can expand authority; retain only approved, trusted, necessary instances.", "Τα ειδικά bit προνομίων μπορούν να διευρύνουν εξουσία· διατήρησε μόνο εγκεκριμένες, αξιόπιστες και αναγκαίες περιπτώσεις.")),
+    q(p("A file's owner is correct, but an unintended team can still change it. Which control should be reviewed?", "Ο ιδιοκτήτης αρχείου είναι σωστός, αλλά μη επιθυμητή ομάδα μπορεί να το αλλάξει. Ποιος έλεγχος πρέπει να εξεταστεί;"), [p("The file's group assignment and group write permission", "Η ομάδα αρχείου και το δικαίωμα εγγραφής ομάδας"), p("The host's screen resolution", "Την ανάλυση οθόνης του host"), p("The DNS mail exchanger", "Τον mail exchanger DNS"), p("The file's last displayed color", "Το τελευταίο χρώμα εμφάνισης αρχείου")], 0, p("Ownership and group permissions work together; correct ownership alone does not prevent unsafe group access.", "Ιδιοκτησία και δικαιώματα ομάδας λειτουργούν μαζί· η σωστή ιδιοκτησία από μόνη της δεν αποτρέπει μη ασφαλή πρόσβαση ομάδας.")),
   ],
   "sr-net": [
-    { q: { en: "lo is always…", el: "Το lo είναι πάντα…" }, choices: [{ en: "8.8.8.8", el: "8.8.8.8" }, { en: "127.0.0.1", el: "127.0.0.1" }, { en: "0.0.0.0", el: "0.0.0.0" }, { en: "255.255.255.255", el: "255.255.255.255" }], answer: 1, why: { en: "Loopback.", el: "Loopback." } },
-    { q: { en: "dhclient asks…", el: "Το dhclient ζητά…" }, choices: [{ en: "A TLS cert", el: "Πιστοποιητικό TLS" }, { en: "A DHCP lease / IP", el: "Μίσθωση DHCP / IP" }, { en: "A man page", el: "man" }, { en: "SUID", el: "SUID" }], answer: 1, why: { en: "Dynamic addressing.", el: "Δυναμική διευθυνσιοδότηση." } },
-    { q: { en: "Changing MAC to bypass someone else's network control is…", el: "Αλλαγή MAC για παράκαμψη ξένου δικτύου είναι…" }, choices: [{ en: "Fine always", el: "Πάντα ΟΚ" }, { en: "Illegal without authorisation", el: "Παράνομο χωρίς άδεια" }, { en: "Required by HTTP", el: "Απαίτηση HTTP" }, { en: "A DNS standard", el: "Πρότυπο DNS" }], answer: 1, why: { en: "Lab only.", el: "Μόνο lab." } },
+    q(p("A system lists a loopback interface with the address 127.0.0.1. What does it represent?", "Ένα σύστημα εμφανίζει loopback διεπαφή με διεύθυνση 127.0.0.1. Τι αντιπροσωπεύει;"), [p("The local host communicating with itself", "Τον τοπικό host που επικοινωνεί με τον εαυτό του"), p("The organization's public gateway", "Την δημόσια πύλη του οργανισμού"), p("A wireless access point", "Ασύρματο access point"), p("A remote database server", "Απομακρυσμένο server βάσης")], 0, p("Loopback is local to the machine and does not identify another network host.", "Το loopback είναι τοπικό στον υπολογιστή και δεν αναγνωρίζει άλλον host δικτύου.")),
+    q(p("A client requests network settings from an address-allocation service. Which information may be provided?", "Ένας client ζητά ρυθμίσεις δικτύου από υπηρεσία εκχώρησης διευθύνσεων. Ποιες πληροφορίες μπορεί να δοθούν;"), [p("An address lease, subnet, gateway, and resolver", "Μίσθωση διεύθυνσης, subnet, gateway και resolver"), p("A private authentication key", "Ιδιωτικό κλειδί ταυτοποίησης"), p("A disk image and chain-of-custody form", "Image δίσκου και έντυπο αλυσίδας φύλαξης"), p("A browser's saved passwords", "Αποθηκευμένους κωδικούς browser")], 0, p("Dynamic address configuration can supply the settings needed to join a network.", "Η δυναμική ρύθμιση διευθύνσεων μπορεί να παρέχει τις ρυθμίσεις σύνδεσης στο δίκτυο.")),
+    q(p("An engineer changes a hardware address and claims this makes the device anonymous. Is that correct?", "Ένας μηχανικός αλλάζει διεύθυνση υλικού και ισχυρίζεται ότι έτσι η συσκευή γίνεται ανώνυμη. Είναι σωστό;"), [p("No; this identifier change does not provide anonymity or authorization", "Όχι· η αλλαγή αναγνωριστικού δεν παρέχει ανωνυμία ή εξουσιοδότηση"), p("Yes; all network monitoring becomes impossible", "Ναι· κάθε παρακολούθηση δικτύου γίνεται αδύνατη"), p("Yes; it automatically encrypts traffic", "Ναι· κρυπτογραφεί αυτόματα την κίνηση"), p("No; hardware addresses are passwords", "Όχι· οι διευθύνσεις υλικού είναι κωδικοί")], 0, p("Address changes can be observed and must never be used to evade controls on networks without authorization.", "Οι αλλαγές διευθύνσεων μπορούν να εντοπιστούν και δεν πρέπει να χρησιμοποιούνται για παράκαμψη ελέγχων χωρίς άδεια.")),
   ],
   "sr-proc": [
-    { q: { en: "ps aux shows…", el: "ps aux δείχνει…" }, choices: [{ en: "Only cron", el: "Μόνο cron" }, { en: "All users' processes", el: "Διεργασίες όλων" }, { en: "DNS only", el: "Μόνο DNS" }, { en: "Disk partitions", el: "Διαμερίσματα" }], answer: 1, why: { en: "a,u,x flags widen the listing.", el: "a,u,x διευρύνουν." } },
-    { q: { en: "kill -9 is…", el: "kill -9 είναι…" }, choices: [{ en: "A polite hangup", el: "Ευγενικό hangup" }, { en: "SIGKILL — force stop", el: "SIGKILL — βίαιο stop" }, { en: "Nice +9", el: "Nice +9" }, { en: "FTP restart", el: "FTP restart" }], answer: 1, why: { en: "-1 is SIGHUP.", el: "-1 = SIGHUP." } },
-    { q: { en: "Appending & …", el: "Το & στο τέλος…" }, choices: [{ en: "Deletes the process", el: "Σβήνει τη διεργασία" }, { en: "Runs it in the background", el: "Τη βάζει στο παρασκήνιο" }, { en: "Formats /tmp", el: "Format /tmp" }, { en: "Opens man", el: "Ανοίγει man" }], answer: 1, why: { en: "jobs / fg manage those jobs.", el: "jobs / fg." } },
+    q(p("An investigator needs a system-wide view of active processes, including those owned by other users. What should the process inventory include?", "Ένας ερευνητής χρειάζεται συνολική εικόνα ενεργών διεργασιών, ακόμη και άλλων χρηστών. Τι πρέπει να περιλαμβάνει η απογραφή διεργασιών;"), [p("Process identifiers, owners, resource use, and launch details", "Αναγνωριστικά διεργασιών, ιδιοκτήτες, χρήση πόρων και πληροφορίες εκκίνησης"), p("Only filenames from the home directory", "Μόνο ονόματα αρχείων από τον προσωπικό φάκελο"), p("Only wireless network names", "Μόνο ονόματα ασύρματων δικτύων"), p("A list of installed fonts", "Λίστα εγκατεστημένων γραμματοσειρών")], 0, p("Ownership and launch context help distinguish expected work from suspicious processes.", "Ιδιοκτησία και πλαίσιο εκκίνησης βοηθούν να διακρίνεις αναμενόμενη από ύποπτη διεργασία.")),
+    q(p("A service is unresponsive but may still be saving data. Which action should be preferred before a forceful termination?", "Μια υπηρεσία δεν αποκρίνεται αλλά μπορεί ακόμη να αποθηκεύει δεδομένα. Ποια ενέργεια προτιμάται πριν από εξαναγκασμένο τερματισμό;"), [p("Request a graceful shutdown and observe whether it exits", "Ζήτησε ομαλό τερματισμό και παρατήρησε αν κλείνει"), p("Terminate every process on the host", "Τερμάτισε κάθε διεργασία του host"), p("Delete its executable while it is running", "Διέγραψε το εκτελέσιμο ενώ εκτελείται"), p("Disable all system logs", "Απενεργοποίησε όλα τα logs συστήματος")], 0, p("A graceful signal gives the process a chance to clean up; force should be a last resort.", "Ένα ομαλό σήμα επιτρέπει στη διεργασία να ολοκληρώσει καθαρισμό· ο εξαναγκασμός είναι έσχατη λύση.")),
+    q(p("A long-running analysis should continue after you close the current interactive prompt. What process behavior is needed?", "Μια χρονοβόρα ανάλυση πρέπει να συνεχιστεί όταν κλείσεις το τρέχον διαδραστικό prompt. Ποια συμπεριφορά διεργασίας χρειάζεται;"), [p("Run independently in the background with an appropriate owner and output handling", "Εκτέλεση ανεξάρτητα στο παρασκήνιο με κατάλληλο ιδιοκτήτη και διαχείριση εξόδου"), p("Run as root by default", "Εκτέλεση ως root από προεπιλογή"), p("Disable its logs", "Απενεργοποίηση των logs της"), p("Move its files into the network interface", "Μετακίνηση αρχείων στη διεπαφή δικτύου")], 0, p("Background work still needs an owner, resource limits, and a clear place for its output and errors.", "Η εργασία στο παρασκήνιο εξακολουθεί να χρειάζεται ιδιοκτήτη, όρια πόρων και σαφή θέση εξόδου και σφαλμάτων.")),
   ],
   "sr-env": [
-    { q: { en: "HISTSIZE=0 must have…", el: "HISTSIZE=0 πρέπει…" }, choices: [{ en: "Spaces around =", el: "Κενά γύρω από =" }, { en: "No spaces around =", el: "Χωρίς κενά" }, { en: "A comma", el: "Κόμμα" }, { en: "sudo always", el: "πάντα sudo" }], answer: 1, why: { en: "VAR=value syntax.", el: "Σύνταξη VAR=value." } },
-    { q: { en: "export makes a var…", el: "Το export κάνει τη μεταβλητή…" }, choices: [{ en: "Hidden from ps", el: "Κρυφή από ps" }, { en: "Inherited by child processes", el: "Κληρονομήσιμη στα παιδιά" }, { en: "A firewall rule", el: "Κανόνα firewall" }, { en: "Immutable kernel", el: "Αμετάβλητο kernel" }], answer: 1, why: { en: "Environment vs shell scope.", el: "Περιβάλλον vs shell." } },
-    { q: { en: "unset NAME…", el: "unset NAME…" }, choices: [{ en: "Creates NAME", el: "Δημιουργεί NAME" }, { en: "Deletes the variable", el: "Διαγράφει τη μεταβλητή" }, { en: "Installs apt", el: "Εγκαθιστά apt" }, { en: "Opens nano", el: "Ανοίγει nano" }], answer: 1, why: { en: "Gone until you set it again.", el: "Φεύγει μέχρι να την ξαναθέσεις." } },
+    q(p("A child process needs a configuration value from its parent shell. What must be true for the child to inherit it?", "Μια θυγατρική διεργασία χρειάζεται τιμή ρύθμισης από το γονικό shell. Τι πρέπει να ισχύει για να την κληρονομήσει;"), [p("The value must be part of the exported process environment", "Η τιμή πρέπει να ανήκει στο εξαγόμενο περιβάλλον διεργασίας"), p("The variable must be named after the hostname", "Η μεταβλητή πρέπει να έχει όνομα host"), p("The user must be in the administrator group", "Ο χρήστης πρέπει να ανήκει στην ομάδα διαχειριστών"), p("The value must be stored in a network packet", "Η τιμή πρέπει να αποθηκευτεί σε πακέτο δικτύου")], 0, p("A shell-local variable is not automatically inherited; exported environment values are passed to child processes.", "Μια τοπική μεταβλητή shell δεν κληρονομείται αυτόματα· οι εξαγόμενες τιμές περιβάλλοντος περνούν σε θυγατρικές διεργασίες.")),
+    q(p("A temporary setting is removed from the current shell. What is the expected scope of that change?", "Μια προσωρινή ρύθμιση αφαιρείται από το τρέχον shell. Ποιο είναι το αναμενόμενο πεδίο αυτής της αλλαγής;"), [p("The current shell and any future children that inherit its environment", "Το τρέχον shell και μελλοντικές θυγατρικές διεργασίες που κληρονομούν το περιβάλλον"), p("Every user's account on every host", "Κάθε λογαριασμός σε κάθε host"), p("The network's DHCP server", "Τον DHCP server του δικτύου"), p("All files on the disk", "Όλα τα αρχεία του δίσκου")], 0, p("Shell environment changes are scoped; they do not rewrite system-wide configuration unless deliberately saved there.", "Οι αλλαγές περιβάλλοντος shell έχουν περιορισμένο πεδίο· δεν αλλάζουν ρυθμίσεις όλου του συστήματος εκτός αν αποθηκευτούν σκόπιμα εκεί.")),
+    q(p("A developer sets shell history length to zero and assumes sensitive commands can no longer be recovered. What is the flaw in that assumption?", "Ένας developer ορίζει μηδενικό μήκος ιστορικού shell και υποθέτει ότι ευαίσθητες εντολές δεν μπορούν πλέον να ανακτηθούν. Ποιο είναι το λάθος;"), [p("Other logs, process records, or copies may still retain evidence", "Άλλα logs, εγγραφές διεργασιών ή αντίγραφα μπορεί να διατηρούν στοιχεία"), p("The setting encrypts the filesystem", "Η ρύθμιση κρυπτογραφεί το σύστημα αρχείων"), p("The setting changes every user's password", "Η ρύθμιση αλλάζει τον κωδικό κάθε χρήστη"), p("Nothing can be recorded in a Linux system", "Δεν μπορεί να καταγραφεί τίποτα σε Linux")], 0, p("History settings are not a privacy guarantee; avoid putting secrets in command input and follow logging policy.", "Οι ρυθμίσεις ιστορικού δεν εγγυώνται ιδιωτικότητα· απόφυγε μυστικά σε είσοδο εντολών και ακολούθησε την πολιτική καταγραφής.")),
   ],
   "sr-bash": [
-    { q: { en: "#!/bin/bash is the…", el: "#!/bin/bash είναι…" }, choices: [{ en: "SUID bit", el: "SUID" }, { en: "Shebang — interpreter line", el: "Shebang — διερμηνέας" }, { en: "Cron field", el: "Πεδίο cron" }, { en: "MAC", el: "MAC" }], answer: 1, why: { en: "Tells the kernel to use bash.", el: "Λέει στο kernel να χρησιμοποιήσει bash." } },
-    { q: { en: "./script means…", el: "./script σημαίνει…" }, choices: [{ en: "Run from PATH only", el: "Μόνο PATH" }, { en: "Run the file in the current directory", el: "Τρέξε το αρχείο εδώ" }, { en: "Delete it", el: "Διαγραφή" }, { en: "Compile it", el: "Compile" }], answer: 1, why: { en: "Need +x too.", el: "Χρειάζεται και +x." } },
-    { q: { en: "nmap -sn is a…", el: "nmap -sn είναι…" }, choices: [{ en: "OS exploit", el: "OS exploit" }, { en: "Ping / host-discovery sweep", el: "Ping / ανακάλυψη hosts" }, { en: "Hash crack", el: "Hash crack" }, { en: "TLS MITM", el: "TLS MITM" }], answer: 1, why: { en: "Formerly -sP. Lab networks only.", el: "Πρώην -sP. Μόνο lab." } },
+    q(p("A script begins by naming an interpreter. Why does that first-line declaration matter?", "Ένα script αρχίζει δηλώνοντας interpreter. Γιατί έχει σημασία αυτή η πρώτη γραμμή;"), [p("It tells the operating system which interpreter should process the file", "Ενημερώνει το λειτουργικό ποιος interpreter πρέπει να επεξεργαστεί το αρχείο"), p("It grants administrator rights automatically", "Παρέχει αυτόματα δικαιώματα διαχειριστή"), p("It hides the script from file listings", "Κρύβει το script από λίστες αρχείων"), p("It encrypts the script contents", "Κρυπτογραφεί το περιεχόμενο του script")], 0, p("The interpreter declaration makes execution behavior explicit; it does not grant privilege or prove the script is safe.", "Η δήλωση interpreter ορίζει ρητά τη συμπεριφορά εκτέλεσης· δεν παρέχει δικαιώματα ούτε αποδεικνύει ότι το script είναι ασφαλές.")),
+    q(p("A greeting script asks a learner for a name, stores the response, and uses it in a message. Which concept is being practiced?", "Ένα script καλωσορίσματος ζητά όνομα, αποθηκεύει την απάντηση και τη χρησιμοποιεί σε μήνυμα. Ποια έννοια εξασκείται;"), [p("Reading input into a variable and reusing that value", "Ανάγνωση εισόδου σε μεταβλητή και επαναχρησιμοποίηση της τιμής"), p("Changing a network route", "Αλλαγή διαδρομής δικτύου"), p("Verifying a disk image", "Επαλήθευση image δίσκου"), p("Rotating a private key", "Αλλαγή ιδιωτικού κλειδιού")], 0, p("Variables let a script retain input and use it later in its workflow.", "Οι μεταβλητές επιτρέπουν στο script να κρατά είσοδο και να τη χρησιμοποιεί αργότερα.")),
+    q(p("A small discovery script is adapted to a new address range. What must be checked before it runs?", "Ένα μικρό script ανακάλυψης προσαρμόζεται σε νέο εύρος διευθύνσεων. Τι πρέπει να ελεγχθεί πριν εκτελεστεί;"), [p("That the range is authorized and the script's scope and impact are understood", "Ότι το εύρος είναι εξουσιοδοτημένο και είναι κατανοητά το πεδίο και ο αντίκτυπος του script"), p("That the range contains the largest possible number of hosts", "Ότι το εύρος περιέχει όσο το δυνατόν περισσότερους host"), p("That output is hidden from the team", "Ότι η έξοδος κρύβεται από την ομάδα"), p("That every discovered service is modified", "Ότι τροποποιείται κάθε υπηρεσία που εντοπίζεται")], 0, p("Automation can amplify mistakes; validate authorization, target scope, and expected traffic first.", "Ο αυτοματισμός μπορεί να πολλαπλασιάσει λάθη· επικύρωσε πρώτα άδεια, εύρος στόχων και αναμενόμενη κίνηση.")),
   ],
   "sr-cron": [
-    { q: { en: "Crontab field 1 is…", el: "Το 1ο πεδίο crontab είναι…" }, choices: [{ en: "Year", el: "Έτος" }, { en: "Minute 0–59", el: "Λεπτό 0–59" }, { en: "User always", el: "Πάντα χρήστης" }, { en: "Path", el: "Path" }], answer: 1, why: { en: "Then hour, dom, month, dow.", el: "Μετά ώρα, μέρα, μήνας, εβδομάδα." } },
-    { q: { en: "55 23 * * * means…", el: "55 23 * * * σημαίνει…" }, choices: [{ en: "05:23 once", el: "05:23 μία φορά" }, { en: "23:55 every day", el: "23:55 κάθε μέρα" }, { en: "Every 23 seconds", el: "Κάθε 23 δευτ." }, { en: "Never", el: "Ποτέ" }], answer: 1, why: { en: "minute 55, hour 23.", el: "λεπτό 55, ώρα 23." } },
-    { q: { en: "Runlevel 0…", el: "Runlevel 0…" }, choices: [{ en: "Reboot", el: "Reboot" }, { en: "Halt the system", el: "Σβήσιμο συστήματος" }, { en: "GUI only", el: "Μόνο GUI" }, { en: "Single-user", el: "Single-user" }], answer: 1, why: { en: "6 is reboot, 1 is single-user.", el: "6=reboot, 1=single-user." } },
+    q(p("A scheduled job is configured to run every night. Which detail is most important when reviewing its risk?", "Μια προγραμματισμένη εργασία ρυθμίζεται να εκτελείται κάθε βράδυ. Ποια λεπτομέρεια είναι σημαντικότερη στην αξιολόγηση κινδύνου;"), [p("The account it runs as and the resources it can modify", "Ο λογαριασμός εκτέλεσης και οι πόροι που μπορεί να τροποποιήσει"), p("The user's favorite shell color", "Το αγαπημένο χρώμα shell του χρήστη"), p("The computer's screen size", "Το μέγεθος οθόνης του υπολογιστή"), p("The number of files in a public repository", "Τον αριθμό αρχείων σε δημόσιο repository")], 0, p("Scheduled work runs unattended, so ownership and permissions determine its potential impact.", "Οι προγραμματισμένες εργασίες εκτελούνται χωρίς επίβλεψη, άρα ιδιοκτησία και δικαιώματα καθορίζουν τον πιθανό αντίκτυπο.")),
+    q(p("A system service is configured to start during a particular boot mode. What should an administrator verify?", "Μια υπηρεσία συστήματος ρυθμίζεται να ξεκινά σε συγκεκριμένη λειτουργία εκκίνησης. Τι πρέπει να επαληθεύσει ο διαχειριστής;"), [p("Its dependencies, intended run states, and least-privilege account", "Τις εξαρτήσεις, τις επιθυμητές καταστάσεις εκκίνησης και λογαριασμό ελάχιστων δικαιωμάτων"), p("That it runs with unrestricted root access", "Ότι εκτελείται με απεριόριστη πρόσβαση root"), p("That its logs are deleted on every boot", "Ότι τα logs διαγράφονται σε κάθε εκκίνηση"), p("That unrelated services are also enabled", "Ότι ενεργοποιούνται και άσχετες υπηρεσίες")], 0, p("Boot-time configuration should be intentional and consistent with service dependencies and privilege requirements.", "Η ρύθμιση εκκίνησης πρέπει να είναι σκόπιμη και συνεπής με εξαρτήσεις και απαιτήσεις δικαιωμάτων.")),
+    q(p("A recurring job is unexpectedly running under a more privileged account than intended. What is the primary fix?", "Μια επαναλαμβανόμενη εργασία εκτελείται απρόσμενα με πιο προνομιούχο λογαριασμό από τον προβλεπόμενο. Ποια είναι η βασική διόρθωση;"), [p("Correct its execution identity and restrict the job's writable inputs", "Διόρθωσε την ταυτότητα εκτέλεσης και περιόρισε τις εγγράψιμες εισόδους"), p("Increase its schedule frequency", "Αύξησε τη συχνότητα εκτέλεσης"), p("Disable audit logs", "Απενεργοποίησε τα logs ελέγχου"), p("Make its script world-writable", "Κάνε το script εγγράψιμο από όλους")], 0, p("Jobs should run with only the authority needed, and their inputs must not be modifiable by less-trusted users.", "Οι εργασίες πρέπει να εκτελούνται με τα ελάχιστα αναγκαία δικαιώματα και οι είσοδοί τους να μην αλλάζουν από λιγότερο έμπιστους χρήστες.")),
   ],
   "sr-svc": [
-    { q: { en: "Apache's default page lives at…", el: "Η default σελίδα Apache είναι στο…" }, choices: [{ en: "/etc/passwd", el: "/etc/passwd" }, { en: "/var/www/html/index.html", el: "/var/www/html/index.html" }, { en: "/root/Desktop", el: "/root/Desktop" }, { en: "/proc", el: "/proc" }], answer: 1, why: { en: "Document root.", el: "Document root." } },
-    { q: { en: "SSH vs telnet…", el: "SSH vs telnet…" }, choices: [{ en: "Same encryption", el: "Ίδια κρυπτογράφηση" }, { en: "SSH encrypts the channel", el: "Το SSH κρυπτογραφεί το κανάλι" }, { en: "Telnet is newer", el: "Το telnet είναι νεότερο" }, { en: "Neither uses TCP", el: "Κανένα TCP" }], answer: 1, why: { en: "Never telnet credentials.", el: "Ποτέ κωδικοί σε telnet." } },
-    { q: { en: "Anonymous FTP login in this lab is…", el: "Anonymous FTP εδώ είναι…" }, choices: [{ en: "A live CESCA server", el: "Ζωντανός CESCA" }, { en: "A simulated Gamehack server", el: "Προσομοίωση Gamehack" }, { en: "Required on the internet", el: "Υποχρεωτικό στο internet" }, { en: "A kernel module", el: "Κερνελ module" }], answer: 1, why: { en: "ftp.forge.lab is fake. Stay in scope.", el: "Το ftp.forge.lab είναι ψεύτικο." } },
+    q(p("A web server process is active, but clients still receive an error page. What should be checked next?", "Μια διεργασία web server είναι ενεργή, αλλά οι clients λαμβάνουν σφάλμα. Τι πρέπει να ελεγχθεί στη συνέχεια;"), [p("The service configuration, document root, logs, and network path", "Τις ρυθμίσεις υπηρεσίας, document root, logs και διαδρομή δικτύου"), p("The user's desktop wallpaper", "Την ταπετσαρία του χρήστη"), p("Only the account's shell history", "Μόνο το ιστορικό shell λογαριασμού"), p("Whether the server has a private key for another host", "Αν ο server έχει ιδιωτικό κλειδί για άλλο host")], 0, p("A running process does not guarantee a healthy application; inspect configuration, logs, and reachability together.", "Μια ενεργή διεργασία δεν εγγυάται υγιή εφαρμογή· έλεγξε μαζί ρυθμίσεις, logs και προσβασιμότητα.")),
+    q(p("Which statement best distinguishes encrypted remote administration from a legacy clear-text remote terminal?", "Ποια δήλωση διακρίνει καλύτερα την απομακρυσμένη διαχείριση με κρυπτογράφηση από ένα παλιό clear-text τερματικό;"), [p("Encryption protects credentials and session content in transit when correctly configured", "Η κρυπτογράφηση προστατεύει διαπιστευτήρια και περιεχόμενο συνεδρίας κατά τη μεταφορά, όταν έχει ρυθμιστεί σωστά"), p("Encryption removes the need for account authorization", "Η κρυπτογράφηση καταργεί την ανάγκη εξουσιοδότησης λογαριασμού"), p("A clear-text protocol is safer on public networks", "Ένα clear-text πρωτόκολλο είναι ασφαλέστερο σε δημόσια δίκτυα"), p("Both protocols guarantee that the endpoint is uncompromised", "Και τα δύο πρωτόκολλα εγγυώνται ότι το endpoint δεν έχει παραβιαστεί")], 0, p("Encryption protects data in transit but does not replace strong identity checks, endpoint security, or logging.", "Η κρυπτογράφηση προστατεύει δεδομένα κατά τη μεταφορά αλλά δεν αντικαθιστά ταυτοποίηση, ασφάλεια endpoint ή καταγραφή.")),
+    q(p("An old file-transfer service allows anonymous access. What should a defender assess first?", "Μια παλιά υπηρεσία μεταφοράς αρχείων επιτρέπει ανώνυμη πρόσβαση. Τι πρέπει να αξιολογήσει πρώτα ο αμυνόμενος;"), [p("Whether anonymous users can read or write sensitive locations", "Αν ανώνυμοι χρήστες μπορούν να διαβάζουν ή να γράφουν ευαίσθητες τοποθεσίες"), p("Whether the service has a colorful banner", "Αν η υπηρεσία έχει πολύχρωμο banner"), p("Whether every user shares one password", "Αν όλοι οι χρήστες μοιράζονται έναν κωδικό"), p("Whether the hostname is short", "Αν το hostname είναι σύντομο")], 0, p("Anonymous access can expose or alter data; review permissions, scope, and business need.", "Η ανώνυμη πρόσβαση μπορεί να εκθέσει ή να αλλάξει δεδομένα· έλεγξε δικαιώματα, πεδίο και επιχειρηματική ανάγκη.")),
   ],
   "dfir-intake": [
-    { q: { en: "A matching SHA-256 digest supports…", el: "Ίδιο SHA-256 υποστηρίζει…" }, choices: [{ en: "The file is harmless", el: "Το αρχείο είναι ακίνδυνο" }, { en: "The compared byte sequences match", el: "Τα bytes που συγκρίθηκαν είναι ίδια" }, { en: "The author is known", el: "Είναι γνωστός ο δημιουργός" }, { en: "The file is original", el: "Είναι πρωτότυπο" }], answer: 1, why: { en: "A digest supports byte identity, not safety or authorship.", el: "Το digest υποστηρίζει ταυτότητα bytes, όχι ασφάλεια ή δημιουργό." } },
-    { q: { en: "What is chain of custody for?", el: "Σε τι χρησιμεύει chain of custody;" }, choices: [{ en: "Provenance and handling record", el: "Καταγραφή προέλευσης και χειρισμού" }, { en: "Running a suspicious file", el: "Εκτέλεση ύποπτου αρχείου" }, { en: "Changing timestamps", el: "Αλλαγή timestamps" }, { en: "Attribution from an IP", el: "Attribution από IP" }], answer: 0, why: { en: "It records who handled evidence, when, how, and why.", el: "Καταγράφει ποιος, πότε, πώς και γιατί χειρίστηκε τεκμήριο." } },
-    { q: { en: "A file extension is…", el: "Η κατάληξη αρχείου είναι…" }, choices: [{ en: "Proof of file type", el: "Απόδειξη τύπου" }, { en: "A clue that should be checked against content", el: "Ένδειξη που ελέγχεται με το περιεχόμενο" }, { en: "A cryptographic hash", el: "Cryptographic hash" }, { en: "A chain-of-custody log", el: "Chain-of-custody log" }], answer: 1, why: { en: "Use file signatures and metadata to verify the actual format.", el: "Έλεγξε signatures και metadata για πραγματικό format." } },
+    q(p("Two acquired evidence files produce the same strong cryptographic digest. What does that support?", "Δύο αποκτημένα αρχεία τεκμηρίων έχουν το ίδιο ισχυρό κρυπτογραφικό digest. Τι υποστηρίζει αυτό;"), [p("That the files are very likely byte-for-byte identical", "Ότι τα αρχεία είναι πολύ πιθανό να είναι πανομοιότυπα σε επίπεδο byte"), p("That the evidence proves who created them", "Ότι τα στοιχεία αποδεικνύουν ποιος τα δημιούργησε"), p("That no one accessed the source", "Ότι κανείς δεν προσπέλασε την πηγή"), p("That the file extension is truthful", "Ότι η επέκταση αρχείου είναι αληθινή")], 0, p("A digest helps verify integrity between copies; it does not by itself prove provenance or authorship.", "Το digest βοηθά στην επαλήθευση ακεραιότητας αντιγράφων· δεν αποδεικνύει προέλευση ή δημιουργό.")),
+    q(p("Why record every person, time, transfer, and storage location for collected evidence?", "Γιατί καταγράφουμε κάθε άτομο, χρόνο, μεταφορά και τοποθεσία αποθήκευσης συλλεγμένων τεκμηρίων;"), [p("To preserve a defensible chain of custody", "Για να διατηρήσουμε υπερασπίσιμη αλυσίδα φύλαξης"), p("To make the evidence more interesting", "Για να κάνουμε τα στοιχεία πιο ενδιαφέροντα"), p("To change the file's contents", "Για να αλλάξουμε το περιεχόμενο αρχείου"), p("To avoid hashing the evidence", "Για να αποφύγουμε τον υπολογισμό digest")], 0, p("Chain-of-custody records make handling traceable and help identify gaps or unauthorized changes.", "Η αλυσίδα φύλαξης καθιστά τον χειρισμό ανιχνεύσιμο και βοηθά στον εντοπισμό κενών ή μη εξουσιοδοτημένων αλλαγών.")),
+    q(p("A file is named report.pdf, but its detected internal format is an executable. What should an investigator conclude?", "Ένα αρχείο ονομάζεται report.pdf, αλλά η εσωτερική μορφή του αναγνωρίζεται ως εκτελέσιμο. Τι πρέπει να συμπεράνει ο ερευνητής;"), [p("The extension alone is unreliable; preserve and inspect the artifact safely", "Η επέκταση από μόνη της δεν είναι αξιόπιστη· διατήρησε και εξέτασε με ασφάλεια το τεκμήριο"), p("The file is definitely harmless", "Το αρχείο είναι σίγουρα ακίνδυνο"), p("The filename proves who sent it", "Το όνομα αποδεικνύει ποιος το έστειλε"), p("The file should be executed to confirm its type", "Το αρχείο πρέπει να εκτελεστεί για επιβεβαίωση")], 0, p("Names and extensions can be misleading. Identify type from the artifact and avoid execution during intake.", "Ονόματα και επεκτάσεις μπορεί να παραπλανούν. Αναγνώρισε τη μορφή από το τεκμήριο και απόφυγε εκτέλεση κατά την παραλαβή.")),
   ],
   "dfir-windows": [
-    { q: { en: "NTUSER.DAT primarily represents…", el: "Το NTUSER.DAT αντιπροσωπεύει κυρίως…" }, choices: [{ en: "A user registry hive", el: "Hive Registry χρήστη" }, { en: "A packet capture", el: "Packet capture" }, { en: "A disk image", el: "Disk image" }, { en: "A browser executable", el: "Εκτελέσιμο browser" }], answer: 0, why: { en: "Per-user settings are stored in the user's hive.", el: "Ρυθμίσεις χρήστη αποθηκεύονται στο user hive." } },
-    { q: { en: "Windows Security event 4625 indicates…", el: "Το Windows Security event 4625 δείχνει…" }, choices: [{ en: "Successful login", el: "Επιτυχή σύνδεση" }, { en: "Failed login", el: "Αποτυχημένη σύνδεση" }, { en: "Audit log cleared", el: "Καθαρισμό audit log" }, { en: "Account created", el: "Δημιουργία account" }], answer: 1, why: { en: "Correlate event IDs with user, host, time, and nearby events.", el: "Συσχέτισε ID με χρήστη, host, χρόνο και γειτονικά events." } },
-    { q: { en: "A browser history row is strongest when…", el: "Μια γραμμή browser history είναι ισχυρότερη όταν…" }, choices: [{ en: "Used alone for attribution", el: "Χρησιμοποιείται μόνη για attribution" }, { en: "Correlated with other artifacts and timestamps", el: "Συσχετίζεται με artifacts και timestamps" }, { en: "Passwords are disclosed", el: "Αποκαλύπτονται κωδικοί" }, { en: "The database is modified", el: "Τροποποιείται η βάση" }], answer: 1, why: { en: "Independent artifacts provide stronger context.", el: "Ανεξάρτητα artifacts δίνουν ισχυρότερο πλαίσιο." } },
+    q(p("A per-user Windows registry hive contains personalization and application settings. What does it most directly represent?", "Ένα per-user Windows registry hive περιέχει εξατομίκευση και ρυθμίσεις εφαρμογών. Τι αντιπροσωπεύει άμεσα;"), [p("Configuration and activity context associated with that user profile", "Πλαίσιο ρυθμίσεων και δραστηριότητας του συγκεκριμένου προφίλ χρήστη"), p("The complete memory image of the computer", "Το πλήρες image μνήμης του υπολογιστή"), p("A packet capture from the network", "Καταγραφή πακέτων δικτύου"), p("A verified list of every password", "Επαληθευμένη λίστα όλων των κωδικών")], 0, p("User hives can contain useful profile artifacts, but each item still needs contextual interpretation.", "Τα hives χρήστη περιέχουν χρήσιμα τεκμήρια προφίλ, αλλά κάθε στοιχείο χρειάζεται ερμηνεία στο πλαίσιό του.")),
+    q(p("A Windows security event records a failed logon. What can it establish by itself?", "Ένα συμβάν ασφαλείας Windows καταγράφει αποτυχημένη σύνδεση. Τι αποδεικνύει από μόνο του;"), [p("That a logon attempt failed according to that event record", "Ότι μια προσπάθεια σύνδεσης απέτυχε σύμφωνα με την εγγραφή"), p("That the account was successfully used", "Ότι ο λογαριασμός χρησιμοποιήθηκε επιτυχώς"), p("Who physically typed the credentials", "Ποιος πληκτρολόγησε φυσικά τα διαπιστευτήρια"), p("That the workstation is malware-free", "Ότι ο σταθμός εργασίας δεν έχει malware")], 0, p("An event records a reported outcome; correlate it with adjacent logs, source, and identity context.", "Ένα συμβάν καταγράφει αναφερόμενο αποτέλεσμα· συσχέτισέ το με γειτονικά logs, πηγή και πλαίσιο ταυτότητας.")),
+    q(p("A browser-history entry is used to support a timeline. What additional evidence makes it stronger?", "Μια εγγραφή ιστορικού browser χρησιμοποιείται για χρονολόγιο. Ποια πρόσθετα στοιχεία την ενισχύουν;"), [p("Related timestamps, cached artifacts, account context, and network records", "Σχετικοί χρόνοι, cache, πλαίσιο λογαριασμού και καταγραφές δικτύου"), p("A screenshot of a different computer", "Στιγμιότυπο άλλου υπολογιστή"), p("A filename extension alone", "Μόνο επέκταση αρχείου"), p("An unverified recollection", "Μη επαληθευμένη ανάμνηση")], 0, p("Multiple independent artifacts improve confidence and help distinguish shared devices or automated activity.", "Πολλαπλά ανεξάρτητα τεκμήρια αυξάνουν την εμπιστοσύνη και ξεχωρίζουν κοινές συσκευές ή αυτοματοποιημένη δραστηριότητα.")),
   ],
   "dfir-documents": [
-    { q: { en: "Modern .docx is commonly…", el: "Το σύγχρονο .docx είναι συνήθως…" }, choices: [{ en: "A ZIP-based OOXML container", el: "ZIP-based OOXML container" }, { en: "A packet capture", el: "Packet capture" }, { en: "An NTFS hive", el: "NTFS hive" }, { en: "A plain bitmap", el: "Bitmap" }], answer: 0, why: { en: "OOXML documents package XML, relationships, metadata, and media.", el: "Τα OOXML πακετάρουν XML, relationships, metadata και media." } },
-    { q: { en: "A detected macro means…", el: "Εντοπισμένο macro σημαίνει…" }, choices: [{ en: "It definitely executed", el: "Σίγουρα εκτελέστηκε" }, { en: "Perform static inspection; execution still needs evidence", el: "Κάνε static inspection· η εκτέλεση θέλει evidence" }, { en: "The document is benign", el: "Το έγγραφο είναι ακίνδυνο" }, { en: "The hash is wrong", el: "Λάθος hash" }], answer: 1, why: { en: "Presence is an indicator, not proof of execution.", el: "Η παρουσία είναι ένδειξη, όχι απόδειξη εκτέλεσης." } },
-    { q: { en: "A hidden image string is…", el: "Κρυφό string εικόνας είναι…" }, choices: [{ en: "Always malicious", el: "Πάντα κακόβουλο" }, { en: "A lead to validate and contextualize", el: "Lead προς επαλήθευση και πλαίσιο" }, { en: "A file hash", el: "File hash" }, { en: "A chain-of-custody record", el: "Chain-of-custody record" }], answer: 1, why: { en: "Steganography findings need independent validation.", el: "Ευρήματα steganography θέλουν ανεξάρτητη επικύρωση." } },
+    q(p("A modern Office document can be opened as a package containing multiple components. Why is this useful in forensics?", "Ένα σύγχρονο έγγραφο Office μπορεί να ανοιχτεί ως πακέτο πολλών στοιχείων. Γιατί είναι χρήσιμο αυτό στην εγκληματολογία;"), [p("It allows safe inspection of metadata, embedded objects, and document structure", "Επιτρέπει ασφαλή εξέταση μεταδεδομένων, ενσωματωμένων αντικειμένων και δομής"), p("It proves that macros were executed", "Αποδεικνύει ότι εκτελέστηκαν macros"), p("It identifies the author with certainty", "Αναγνωρίζει τον δημιουργό με βεβαιότητα"), p("It guarantees the document contains no hidden content", "Εγγυάται ότι δεν υπάρχει κρυφό περιεχόμενο")], 0, p("Container structure can reveal components and metadata without opening the document in an active application.", "Η δομή πακέτου μπορεί να αποκαλύψει στοιχεία και μεταδεδομένα χωρίς άνοιγμα σε ενεργή εφαρμογή.")),
+    q(p("A document contains a macro. What is the most defensible conclusion?", "Ένα έγγραφο περιέχει macro. Ποιο είναι το πιο υπερασπίσιμο συμπέρασμα;"), [p("A macro is present and should be analyzed; presence alone does not prove malicious behavior", "Υπάρχει macro και χρειάζεται ανάλυση· η παρουσία από μόνη της δεν αποδεικνύει κακόβουλη συμπεριφορά"), p("The document definitely infected the system", "Το έγγραφο μόλυνε σίγουρα το σύστημα"), p("The macro was definitely executed", "Το macro εκτελέστηκε σίγουρα"), p("The document can be discarded without review", "Το έγγραφο μπορεί να απορριφθεί χωρίς εξέταση")], 0, p("Capabilities and execution are different claims; inspect code and corroborate behavior with host evidence.", "Οι δυνατότητες και η εκτέλεση είναι διαφορετικοί ισχυρισμοί· εξέτασε τον κώδικα και επιβεβαίωσε συμπεριφορά από στοιχεία host.")),
+    q(p("An image file contains an unexpected text fragment in its metadata or structure. What should the analyst do?", "Ένα αρχείο εικόνας περιέχει απρόσμενο τμήμα κειμένου στα μεταδεδομένα ή στη δομή του. Τι πρέπει να κάνει ο αναλυτής;"), [p("Preserve the original and compare the finding with known format structure", "Διατήρησε το πρωτότυπο και σύγκρινε το εύρημα με τη γνωστή δομή μορφής"), p("Assume it is a valid hidden message", "Υπέθεσε ότι είναι έγκυρο κρυφό μήνυμα"), p("Edit the image before documenting it", "Επεξεργάσου την εικόνα πριν την τεκμηριώσεις"), p("Upload it to a public service without approval", "Ανέβασέ την σε δημόσια υπηρεσία χωρίς έγκριση")], 0, p("Unexpected content is a lead; preserve provenance and test format-specific explanations before inferring intent.", "Το απρόσμενο περιεχόμενο είναι ένδειξη· διατήρησε προέλευση και εξέτασε εξηγήσεις μορφής πριν συμπεράνεις πρόθεση.")),
   ],
   "dfir-web": [
-    { q: { en: "Apache access logs commonly show…", el: "Τα Apache access logs δείχνουν συνήθως…" }, choices: [{ en: "Request line, status, time, client", el: "Request, status, χρόνος, client" }, { en: "Full POST body always", el: "Πάντα πλήρες POST body" }, { en: "RAM pages", el: "RAM pages" }, { en: "Registry hives", el: "Registry hives" }], answer: 0, why: { en: "POST request bodies may require WAF or application logs.", el: "POST bodies μπορεί να απαιτούν WAF/application logs." } },
-    { q: { en: "A WAF rule hit is…", el: "WAF rule hit είναι…" }, choices: [{ en: "An automatic attribution verdict", el: "Αυτόματο attribution" }, { en: "A detector event to validate with context", el: "Detector event προς επαλήθευση με πλαίσιο" }, { en: "A hash mismatch", el: "Hash mismatch" }, { en: "Proof data was exfiltrated", el: "Απόδειξη exfiltration" }], answer: 1, why: { en: "Correlate rule, request, response, timestamps, and impact.", el: "Συσχέτισε rule, request, response, χρόνο και επίπτωση." } },
-    { q: { en: "An IP address alone proves…", el: "Μια IP μόνη της αποδεικνύει…" }, choices: [{ en: "A named person", el: "Συγκεκριμένο άτομο" }, { en: "An observed network address", el: "Παρατηρημένη network address" }, { en: "Intent", el: "Πρόθεση" }, { en: "Malware family", el: "Malware family" }], answer: 1, why: { en: "NAT, VPNs, proxies, and shared infrastructure limit attribution.", el: "NAT, VPN, proxies και shared infrastructure περιορίζουν attribution." } },
+    q(p("A web access log records a request, timestamp, and response status. What does it provide most directly?", "Ένα web access log καταγράφει αίτημα, χρόνο και status απόκρισης. Τι προσφέρει άμεσα;"), [p("A record of what the server logged for that request", "Εγγραφή του τι κατέγραψε ο server για το αίτημα"), p("Proof of the human identity behind the source address", "Απόδειξη ανθρώπινης ταυτότητας πίσω από τη διεύθυνση πηγής"), p("Proof that the response content was read", "Απόδειξη ότι διαβάστηκε το περιεχόμενο απόκρισης"), p("A complete copy of the client device", "Πλήρες αντίγραφο συσκευής client")], 0, p("Logs describe observed requests, but proxies, shared addresses, and incomplete logging limit attribution.", "Τα logs περιγράφουν παρατηρημένα αιτήματα, αλλά proxy, κοινόχρηστες διευθύνσεις και ελλιπής καταγραφή περιορίζουν την απόδοση.")),
+    q(p("A web application firewall records a blocked rule match. What does that show?", "Ένα web application firewall καταγράφει αντιστοίχιση κανόνα που μπλοκαρίστηκε. Τι δείχνει αυτό;"), [p("The control reported a match and blocked or handled the request", "Ο έλεγχος ανέφερε αντιστοίχιση και μπλόκαρε ή διαχειρίστηκε το αίτημα"), p("The application was definitely exploited", "Η εφαρμογή έγινε σίγουρα exploit"), p("The attacker obtained database contents", "Ο επιτιθέμενος απέκτησε περιεχόμενο βάσης"), p("The source address identifies one person", "Η διεύθυνση πηγής αναγνωρίζει ένα άτομο")], 0, p("A rule alert is evidence of a detection event; confirm the application outcome in other records.", "Μια ειδοποίηση κανόνα είναι στοιχείο ανίχνευσης· επιβεβαίωσε το αποτέλεσμα στην εφαρμογή από άλλες καταγραφές.")),
+    q(p("Several suspicious requests share one public address. Why is that not enough to attribute them to one individual?", "Πολλά ύποπτα αιτήματα μοιράζονται μία δημόσια διεύθυνση. Γιατί αυτό δεν αρκεί για απόδοση σε ένα άτομο;"), [p("NAT, proxies, VPNs, and shared networks can represent many users", "NAT, proxy, VPN και κοινόχρηστα δίκτυα μπορεί να αντιπροσωπεύουν πολλούς χρήστες"), p("Addresses never change", "Οι διευθύνσεις δεν αλλάζουν ποτέ"), p("Web logs cannot contain timestamps", "Τα web logs δεν μπορούν να περιέχουν χρόνους"), p("Every request uses a unique address", "Κάθε αίτημα χρησιμοποιεί μοναδική διεύθυνση")], 0, p("An address is a network indicator, not a person. Attribution needs multiple independent sources.", "Μια διεύθυνση είναι δείκτης δικτύου, όχι πρόσωπο. Η απόδοση απαιτεί πολλαπλές ανεξάρτητες πηγές.")),
   ],
   "dfir-network": [
-    { q: { en: "A Wireshark display filter…", el: "Ένα Wireshark display filter…" }, choices: [{ en: "Deletes packets from the capture", el: "Διαγράφει packets" }, { en: "Narrows the displayed packet view", el: "Περιορίζει την προβολή packets" }, { en: "Rewrites the source PCAP", el: "Αλλάζει το PCAP" }, { en: "Authenticates a user", el: "Ελέγχει χρήστη" }], answer: 1, why: { en: "Filters change the view, not the evidence source.", el: "Τα filters αλλάζουν προβολή, όχι source evidence." } },
-    { q: { en: "Follow TCP Stream helps…", el: "Το Follow TCP Stream βοηθά…" }, choices: [{ en: "Reconstruct conversation context", el: "Ανασύνθεση context συνομιλίας" }, { en: "Create a hash", el: "Δημιουργία hash" }, { en: "Mount NTFS", el: "Mount NTFS" }, { en: "Decrypt every TLS stream", el: "Αποκρυπτογράφηση TLS" }], answer: 0, why: { en: "It presents packets from one connection as a conversation.", el: "Παρουσιάζει packets μιας σύνδεσης ως συνομιλία." } },
-    { q: { en: "Exported objects should be…", el: "Τα exported objects πρέπει να…" }, choices: [{ en: "Treated as original evidence", el: "Θεωρούνται πρωτότυπο" }, { en: "Recorded as derived evidence with source stream", el: "Καταγράφονται ως derived με source stream" }, { en: "Uploaded publicly", el: "Ανεβαίνουν δημόσια" }, { en: "Edited in place", el: "Τροποποιούνται επί τόπου" }], answer: 1, why: { en: "Record source capture, frame/stream, export method, and hash.", el: "Κατέγραψε source capture, frame/stream, export και hash." } },
+    q(p("An analyst applies a display filter to a packet capture. What happens to the underlying capture?", "Ένας αναλυτής εφαρμόζει display filter σε packet capture. Τι συμβαίνει στην αρχική καταγραφή;"), [p("The view is narrowed; the original packet evidence remains unchanged", "Περιορίζεται η προβολή· τα αρχικά στοιχεία πακέτων παραμένουν αμετάβλητα"), p("Packets matching the filter are permanently deleted", "Τα πακέτα που ταιριάζουν διαγράφονται μόνιμα"), p("The capture is rewritten with new timestamps", "Η καταγραφή ξαναγράφεται με νέους χρόνους"), p("The source network is disconnected", "Αποσυνδέεται το δίκτυο πηγής")], 0, p("A display filter changes the analyst's view, not the source file.", "Ένα display filter αλλάζει την προβολή του αναλυτή, όχι το αρχικό αρχείο.")),
+    q(p("A reconstructed network conversation contains a transferred file. How should the extracted file be documented?", "Μια ανασυντεθειμένη δικτυακή συνομιλία περιέχει μεταφερόμενο αρχείο. Πώς πρέπει να τεκμηριωθεί το εξαγόμενο αρχείο;"), [p("As derived evidence linked to the original capture and stream", "Ως παράγωγο τεκμήριο συνδεδεμένο με την αρχική καταγραφή και ροή"), p("As an original file with no source information", "Ως πρωτότυπο αρχείο χωρίς πληροφορίες πηγής"), p("As proof of the sender's identity", "Ως απόδειξη ταυτότητας αποστολέα"), p("As harmless because it crossed a network", "Ως ακίνδυνο επειδή μεταφέρθηκε μέσω δικτύου")], 0, p("Record the source capture, conversation identifier, extraction method, and a digest of the derived object.", "Κατέγραψε την αρχική καταγραφή, αναγνωριστικό συνομιλίας, τρόπο εξαγωγής και digest του παράγωγου αντικειμένου.")),
+    q(p("A packet capture shows a connection to an internal service. What additional context best supports an incident timeline?", "Μια packet capture δείχνει σύνδεση σε εσωτερική υπηρεσία. Ποιο πρόσθετο πλαίσιο υποστηρίζει καλύτερα χρονολόγιο συμβάντος;"), [p("Endpoint logs, time synchronization, and service-side records", "Logs endpoint, συγχρονισμό χρόνου και εγγραφές υπηρεσίας"), p("Only the color of the network diagram", "Μόνο το χρώμα του διαγράμματος δικτύου"), p("A guessed username", "Ένα εικαζόμενο όνομα χρήστη"), p("An unrelated image file", "Άσχετο αρχείο εικόνας")], 0, p("Network traffic becomes more meaningful when correlated with endpoint and service evidence on a common timeline.", "Η δικτυακή κίνηση αποκτά νόημα όταν συσχετίζεται με στοιχεία endpoint και υπηρεσίας σε κοινό χρονολόγιο.")),
   ],
   "dfir-disk": [
-    { q: { en: "A forensic image should be…", el: "Ένα forensic image πρέπει να…" }, choices: [{ en: "Acquired read-only and verified", el: "Αποκτηθεί read-only και επαληθευτεί" }, { en: "Edited before hashing", el: "Τροποποιηθεί πριν το hash" }, { en: "Mounted read/write", el: "Mounted read/write" }, { en: "Renamed without notes", el: "Μετονομαστεί χωρίς σημειώσεις" }], answer: 0, why: { en: "Preserve source, document acquisition, and validate the copy.", el: "Διατήρησε πηγή, τεκμηρίωσε acquisition και επικύρωσε αντίγραφο." } },
-    { q: { en: "$MFT primarily stores…", el: "$MFT κυρίως αποθηκεύει…" }, choices: [{ en: "NTFS file metadata records", el: "NTFS file metadata records" }, { en: "PCAP streams", el: "PCAP streams" }, { en: "Passwords in plaintext", el: "Plaintext passwords" }, { en: "Browser cookies only", el: "Μόνο cookies" }], answer: 0, why: { en: "$LogFile records filesystem metadata transactions; the two serve different roles.", el: "$LogFile κρατά filesystem metadata transactions· έχουν διαφορετικούς ρόλους." } },
-    { q: { en: "A deleted MFT entry proves…", el: "Deleted MFT entry αποδεικνύει…" }, choices: [{ en: "All file contents are recoverable", el: "Ανακτάται όλο το περιεχόμενο" }, { en: "A metadata record is marked deleted", el: "Metadata record έχει σημειωθεί deleted" }, { en: "Who deleted the file", el: "Ποιος το διέγραψε" }, { en: "Malware execution", el: "Malware execution" }], answer: 1, why: { en: "Recovery and attribution require additional evidence.", el: "Ανάκτηση και attribution απαιτούν πρόσθετα evidence." } },
+    q(p("A forensic disk image is acquired for later analysis. Which handling principle best protects its evidentiary value?", "Ένα forensic image δίσκου αποκτάται για μελλοντική ανάλυση. Ποια αρχή χειρισμού προστατεύει καλύτερα την αποδεικτική του αξία;"), [p("Preserve the source, use read-only handling, and verify a cryptographic digest", "Διατήρησε την πηγή, χρησιμοποίησε μόνο ανάγνωση και επαλήθευσε κρυπτογραφικό digest"), p("Mount the original read/write and edit files in place", "Κάνε mount το πρωτότυπο με εγγραφή και επεξεργάσου αρχεία επί τόπου"), p("Rename the image without recording the change", "Μετονόμασε το image χωρίς καταγραφή"), p("Skip acquisition notes to save time", "Παράλειψε σημειώσεις απόκτησης για εξοικονόμηση χρόνου")], 0, p("Read-only procedures, documentation, and digest verification help establish that analysis did not alter the source.", "Διαδικασίες μόνο ανάγνωσης, τεκμηρίωση και επαλήθευση digest βοηθούν να αποδειχθεί ότι η ανάλυση δεν άλλαξε την πηγή.")),
+    q(p("A filesystem metadata record is marked deleted. What does that prove?", "Μια εγγραφή μεταδεδομένων συστήματος αρχείων σημειώνεται ως διαγραμμένη. Τι αποδεικνύει αυτό;"), [p("The metadata record is marked deleted; content recovery and attribution need more evidence", "Η εγγραφή μεταδεδομένων σημειώνεται διαγραμμένη· ανάκτηση περιεχομένου και απόδοση χρειάζονται περισσότερα στοιχεία"), p("All file content is fully recoverable", "Όλο το περιεχόμενο ανακτάται πλήρως"), p("A named user deleted it", "Το διέγραψε συγκεκριμένος χρήστης"), p("Malware executed the file", "Το αρχείο εκτελέστηκε από malware")], 0, p("Deletion metadata does not guarantee that file content remains or identify who performed the action.", "Τα μεταδεδομένα διαγραφής δεν εγγυώνται ότι παραμένει περιεχόμενο ούτε αναγνωρίζουν ποιος έκανε την ενέργεια.")),
+    q(p("A recovered filename is important to the case. Which additional step helps test whether it belonged to the relevant event?", "Ένα ανακτημένο όνομα αρχείου είναι σημαντικό για την υπόθεση. Ποιο πρόσθετο βήμα βοηθά να ελεγχθεί αν σχετίζεται με το συμβάν;"), [p("Correlate filesystem times, neighboring records, and independent logs", "Συσχέτισε χρόνους συστήματος αρχείων, γειτονικές εγγραφές και ανεξάρτητα logs"), p("Assume the filename identifies its author", "Υπέθεσε ότι το όνομα αναγνωρίζει τον δημιουργό"), p("Edit the recovered data before hashing", "Επεξεργάσου τα ανακτημένα δεδομένα πριν τον υπολογισμό digest"), p("Publish the full disk image", "Δημοσίευσε ολόκληρο το disk image")], 0, p("Filesystem artifacts provide context, but reliable timelines need corroboration and preserved originals.", "Τα τεκμήρια συστήματος αρχείων παρέχουν πλαίσιο, αλλά αξιόπιστα χρονολόγια χρειάζονται επιβεβαίωση και διατήρηση πρωτοτύπων.")),
   ],
   "dfir-malware": [
-    { q: { en: "Static analysis means…", el: "Static analysis σημαίνει…" }, choices: [{ en: "Inspecting without executing the sample", el: "Εξέταση χωρίς εκτέλεση" }, { en: "Running it on a workstation", el: "Εκτέλεση σε workstation" }, { en: "Deleting logs", el: "Διαγραφή logs" }, { en: "Hash cracking", el: "Cracking hashes" }], answer: 0, why: { en: "Begin with metadata, hashes, strings, and safe code inspection.", el: "Ξεκίνα με metadata, hashes, strings και ασφαλή code inspection." } },
-    { q: { en: "A defanged domain ending .invalid…", el: "Defanged domain με .invalid…" }, choices: [{ en: "Should resolve publicly", el: "Επιλύεται δημόσια" }, { en: "Is a safe, non-routable reporting placeholder", el: "Είναι ασφαλές reporting placeholder" }, { en: "Proves malware", el: "Αποδεικνύει malware" }, { en: "Is an MD5", el: "Είναι MD5" }], answer: 1, why: { en: ".invalid is reserved for examples and prevents accidental live navigation.", el: "Το .invalid είναι δεσμευμένο για παραδείγματα." } },
-    { q: { en: "A clean public scanner result proves…", el: "Καθαρό public scanner result αποδεικνύει…" }, choices: [{ en: "The sample is harmless", el: "Το sample είναι ακίνδυνο" }, { en: "Only that those scanners did not flag it then", el: "Μόνο ότι δεν το επισήμαναν τότε" }, { en: "Its author", el: "Δημιουργό" }, { en: "No behavior", el: "Καμία συμπεριφορά" }], answer: 1, why: { en: "Absence of detections is not proof of benignness; public upload may expose confidential data.", el: "Απουσία detection δεν αποδεικνύει benignness· public upload εκθέτει πιθανώς confidential data." } },
+    q(p("An analyst receives an unknown executable. Which initial examination is safest?", "Ένας αναλυτής λαμβάνει άγνωστο εκτελέσιμο. Ποια αρχική εξέταση είναι ασφαλέστερη;"), [p("Collect metadata, calculate digests, and inspect readable content without running it", "Συγκέντρωσε μεταδεδομένα, υπολόγισε digest και εξέτασε αναγνώσιμο περιεχόμενο χωρίς εκτέλεση"), p("Run it on the analyst's daily workstation", "Εκτέλεσέ το στον καθημερινό σταθμό εργασίας"), p("Disable monitoring before opening it", "Απενεργοποίησε την παρακολούθηση πριν το ανοίξεις"), p("Upload it to a public scanner without approval", "Ανέβασέ το σε δημόσιο scanner χωρίς έγκριση")], 0, p("Begin with non-executing analysis and use an isolated, approved environment for any later dynamic work.", "Ξεκίνα με ανάλυση χωρίς εκτέλεση και χρησιμοποίησε απομονωμένο, εγκεκριμένο περιβάλλον για μεταγενέστερη δυναμική εξέταση.")),
+    q(p("A report replaces a suspicious domain with a reserved, non-routable placeholder. Why is this useful?", "Μια αναφορά αντικαθιστά ύποπτο domain με δεσμευμένο, μη δρομολογήσιμο placeholder. Γιατί είναι χρήσιμο;"), [p("It communicates the indicator without creating an accidental live link", "Μεταφέρει τον δείκτη χωρίς να δημιουργεί κατά λάθος ενεργό σύνδεσμο"), p("It proves the domain hosted malware", "Αποδεικνύει ότι το domain φιλοξενούσε malware"), p("It lets analysts bypass network controls", "Επιτρέπει παράκαμψη ελέγχων δικτύου"), p("It decrypts the sample", "Αποκρυπτογραφεί το δείγμα")], 0, p("Defanging preserves reporting value while reducing the risk of accidental navigation or resolution.", "Το defanging διατηρεί την αξία αναφοράς και μειώνει τον κίνδυνο τυχαίας πλοήγησης ή επίλυσης.")),
+    q(p("Several public scanners report no detection for a sample. What is the justified conclusion?", "Αρκετοί δημόσιοι scanners δεν εντοπίζουν δείγμα. Ποιο συμπέρασμα δικαιολογείται;"), [p("Those services did not flag it at that time; maliciousness is not ruled out", "Οι υπηρεσίες δεν το επισήμαναν τότε· δεν αποκλείεται κακόβουλη συμπεριφορά"), p("The sample is proven harmless", "Το δείγμα αποδεικνύεται ακίνδυνο"), p("The file has never executed", "Το αρχείο δεν εκτελέστηκε ποτέ"), p("The sample's author is known", "Ο δημιουργός του δείγματος είναι γνωστός")], 0, p("Detection coverage is incomplete and changes over time; absence of alerts is not proof of safety.", "Η κάλυψη ανίχνευσης είναι ελλιπής και μεταβάλλεται· η απουσία ειδοποίησης δεν αποδεικνύει ασφάλεια.")),
   ],
   "dfir-memory": [
-    { q: { en: "Memory evidence is especially valuable because it can preserve…", el: "Memory evidence είναι πολύτιμο γιατί διατηρεί…" }, choices: [{ en: "Only old file names", el: "Μόνο ονόματα αρχείων" }, { en: "Volatile processes, sockets, environment, clipboard", el: "Volatile processes, sockets, environment, clipboard" }, { en: "Only registry backups", el: "Μόνο registry backups" }, { en: "Static disk sectors only", el: "Μόνο sectors δίσκου" }], answer: 1, why: { en: "RAM captures a moment-in-time volatile system state.", el: "Η RAM συλλαμβάνει στιγμιαία volatile κατάσταση." } },
-    { q: { en: "pstree adds which context to a process list?", el: "Το pstree προσθέτει ποιο πλαίσιο;" }, choices: [{ en: "Parent-child relationships", el: "Σχέσεις parent-child" }, { en: "File hashes", el: "File hashes" }, { en: "Partition offsets", el: "Partition offsets" }, { en: "Browser bookmarks", el: "Bookmarks" }], answer: 0, why: { en: "An unusual parent can help explain how a process started.", el: "Ασυνήθιστος parent βοηθά να εξηγηθεί εκκίνηση process." } },
-    { q: { en: "A suggested memory profile is…", el: "Προτεινόμενο memory profile είναι…" }, choices: [{ en: "A parsing hypothesis to validate", el: "Υπόθεση parsing προς επικύρωση" }, { en: "The user's password", el: "Κωδικός χρήστη" }, { en: "A disk image", el: "Disk image" }, { en: "Always certain", el: "Πάντα βέβαιο" }], answer: 0, why: { en: "Validate profile output with image metadata and other artifacts.", el: "Επικύρωσε με image metadata και άλλα artifacts." } },
+    q(p("A memory capture may preserve active connections and running processes that are absent from the disk image. Why?", "Μια καταγραφή μνήμης μπορεί να διατηρεί ενεργές συνδέσεις και διεργασίες που απουσιάζουν από disk image. Γιατί;"), [p("Memory records volatile state at a particular moment", "Η μνήμη καταγράφει πτητική κατάσταση σε συγκεκριμένη στιγμή"), p("Disk images always omit every file", "Τα disk image παραλείπουν πάντα όλα τα αρχεία"), p("Network connections are stored only in the registry", "Οι συνδέσεις δικτύου αποθηκεύονται μόνο στο registry"), p("Processes cannot appear on disk", "Οι διεργασίες δεν μπορούν να εμφανίζονται στον δίσκο")], 0, p("Volatile artifacts may disappear on shutdown, so collection timing and documentation matter.", "Τα πτητικά τεκμήρια μπορεί να χαθούν με τον τερματισμό· ο χρόνος συλλογής και η τεκμηρίωση έχουν σημασία.")),
+    q(p("A process tree shows an unusual parent for a familiar application. What does this help an investigator ask?", "Ένα δέντρο διεργασιών δείχνει ασυνήθιστο parent για γνωστή εφαρμογή. Τι βοηθά να ρωτήσει ο ερευνητής;"), [p("How and from what context the process was started", "Πώς και από ποιο πλαίσιο ξεκίνησε η διεργασία"), p("Which disk sector contains the user's password", "Σε ποιο sector βρίσκεται ο κωδικός χρήστη"), p("Whether the system has a mail server", "Αν το σύστημα έχει mail server"), p("Whether the file extension is correct", "Αν η επέκταση αρχείου είναι σωστή")], 0, p("Parent-child relationships add execution context, but should be interpreted alongside paths, times, and other evidence.", "Οι σχέσεις parent-child δίνουν πλαίσιο εκτέλεσης, αλλά πρέπει να ερμηνεύονται μαζί με διαδρομές, χρόνους και άλλα στοιχεία.")),
+    q(p("A memory-analysis tool suggests a profile that matches the image only approximately. How should the result be treated?", "Ένα εργαλείο ανάλυσης μνήμης προτείνει profile που ταιριάζει μόνο κατά προσέγγιση στο image. Πώς πρέπει να αντιμετωπιστεί το αποτέλεσμα;"), [p("As a hypothesis to validate against image metadata and independent artifacts", "Ως υπόθεση προς επιβεβαίωση με μεταδεδομένα image και ανεξάρτητα τεκμήρια"), p("As unquestionable proof of process identity", "Ως αδιαμφισβήτητη απόδειξη ταυτότητας διεργασίας"), p("As a recovered password", "Ως ανακτημένος κωδικός"), p("As evidence that the image was never changed", "Ως απόδειξη ότι το image δεν άλλαξε ποτέ")], 0, p("Profile selection affects parsing; validate assumptions before relying on derived results.", "Η επιλογή profile επηρεάζει την ανάλυση· επιβεβαίωσε τις παραδοχές πριν βασιστείς σε παράγωγα αποτελέσματα.")),
   ],
   "dfir-container": [
-    { q: { en: "docker diff reports…", el: "Το docker diff αναφέρει…" }, choices: [{ en: "Added, deleted, changed paths", el: "Προσθήκες, διαγραφές, αλλαγές paths" }, { en: "Only network packets", el: "Μόνο packets" }, { en: "Password hashes", el: "Hashes κωδικών" }, { en: "VBA macros", el: "VBA macros" }], answer: 0, why: { en: "A/C/D changes compare a container's writable layer with its image.", el: "A/C/D συγκρίνουν writable layer με image." } },
-    { q: { en: "Deleting a secret in a later image layer…", el: "Διαγραφή secret σε μεταγενέστερο layer…" }, choices: [{ en: "Guarantees bytes are erased", el: "Εγγυάται διαγραφή bytes" }, { en: "May leave secret bytes in an earlier layer", el: "Μπορεί να αφήσει bytes σε παλιότερο layer" }, { en: "Changes the host kernel", el: "Αλλάζει host kernel" }, { en: "Rewrites all logs", el: "Ξαναγράφει logs" }], answer: 1, why: { en: "Container image layers are immutable; inspect history and rotate exposed secrets.", el: "Image layers είναι immutable· έλεγξε history και κάνε rotation." } },
-    { q: { en: "docker export typically captures…", el: "Το docker export συνήθως συλλέγει…" }, choices: [{ en: "Filesystem snapshot, not full image history", el: "Filesystem snapshot, όχι όλο image history" }, { en: "Only registry keys", el: "Μόνο registry keys" }, { en: "Every memory page", el: "Κάθε memory page" }, { en: "No evidence", el: "Κανένα evidence" }], answer: 0, why: { en: "Container filesystem export and image-layer acquisition answer different questions.", el: "Filesystem export και image-layer acquisition απαντούν διαφορετικά ερωτήματα." } },
+    q(p("A container's writable layer shows added, changed, and removed paths compared with its base image. What does that comparison help reveal?", "Το εγγράψιμο layer ενός container δείχνει προσθήκες, αλλαγές και αφαιρέσεις σε σχέση με base image. Τι βοηθά να αποκαλύψει αυτή η σύγκριση;"), [p("Changes made during the container's lifecycle", "Αλλαγές που έγιναν κατά τη διάρκεια ζωής του container"), p("Every network packet sent by the host", "Κάθε πακέτο δικτύου που έστειλε ο host"), p("The plaintext content of all credentials", "Το απλό κείμενο όλων των διαπιστευτηρίων"), p("The user's browser history", "Το ιστορικό browser χρήστη")], 0, p("Layer comparison highlights filesystem changes and helps focus forensic review.", "Η σύγκριση layer αναδεικνύει αλλαγές συστήματος αρχείων και εστιάζει την εγκληματολογική εξέταση.")),
+    q(p("A secret is deleted from a later container layer. Why might it still be recoverable?", "Ένα μυστικό διαγράφεται από μεταγενέστερο layer container. Γιατί μπορεί ακόμη να ανακτηθεί;"), [p("An earlier immutable image layer may still contain the original bytes", "Παλαιότερο αμετάβλητο layer image μπορεί να περιέχει ακόμη τα αρχικά bytes"), p("Deletion automatically copies it into memory forever", "Η διαγραφή το αντιγράφει αυτόματα στη μνήμη για πάντα"), p("Container layers cannot store files", "Τα layers container δεν αποθηκεύουν αρχεία"), p("The secret becomes a network address", "Το μυστικό γίνεται διεύθυνση δικτύου")], 0, p("A later deletion hides a file in the merged view but does not rewrite the prior layer; rotate exposed secrets.", "Μια μεταγενέστερη διαγραφή κρύβει αρχείο στην ενιαία προβολή αλλά δεν ξαναγράφει το παλιό layer· άλλαξε εκτεθειμένα μυστικά.")),
+    q(p("A filesystem export is collected from a running container. What limitation should be recorded?", "Συλλέγεται εξαγωγή συστήματος αρχείων από ενεργό container. Ποιος περιορισμός πρέπει να καταγραφεί;"), [p("It may show a filesystem snapshot without preserving full image-layer history", "Μπορεί να δείχνει snapshot συστήματος αρχείων χωρίς πλήρες ιστορικό image layers"), p("It proves who created every file", "Αποδεικνύει ποιος δημιούργησε κάθε αρχείο"), p("It contains all volatile memory by default", "Περιέχει όλη την πτητική μνήμη από προεπιλογή"), p("It guarantees secrets were erased", "Εγγυάται ότι τα μυστικά διαγράφηκαν")], 0, p("Filesystem export and layer-history acquisition answer different questions; document which view was collected.", "Η εξαγωγή συστήματος αρχείων και η απόκτηση ιστορικού layers απαντούν διαφορετικά ερωτήματα· κατέγραψε ποια προβολή συλλέχθηκε.")),
   ],
   "dfir-passwords": [
-    { q: { en: "A password hash is…", el: "Password hash είναι…" }, choices: [{ en: "Encrypted text with a reversible key", el: "Αναστρέψιμο κρυπτογραφημένο κείμενο" }, { en: "A one-way digest commonly checked against candidates", el: "One-way digest που συγκρίνεται με candidates" }, { en: "A username", el: "Username" }, { en: "A packet filter", el: "Packet filter" }], answer: 1, why: { en: "Candidate hashing and comparison can find weak passwords; the hash is not simply decrypted.", el: "Hash candidates και σύγκριση βρίσκουν αδύναμους κωδικούς· δεν αποκρυπτογραφείται απλά." } },
-    { q: { en: "Why salt stored passwords?", el: "Γιατί salt στους κωδικούς;" }, choices: [{ en: "To make every account hash distinct and defeat precomputed reuse", el: "Μοναδικό hash ανά account και αποφυγή precomputed reuse" }, { en: "To reveal the password", el: "Για αποκάλυψη κωδικού" }, { en: "To speed up MD5", el: "Επιτάχυνση MD5" }, { en: "To encrypt a disk", el: "Κρυπτογράφηση δίσκου" }], answer: 0, why: { en: "Use a unique salt and a slow adaptive KDF such as Argon2id, bcrypt, or scrypt.", el: "Χρησιμοποίησε μοναδικό salt και αργό adaptive KDF όπως Argon2id, bcrypt ή scrypt." } },
-    { q: { en: "A recovered candidate password proves…", el: "Ένας ανακτημένος candidate κωδικός αποδεικνύει…" }, choices: [{ en: "Which person typed it", el: "Ποιος τον πληκτρολόγησε" }, { en: "The candidate matches the supplied training digest", el: "Ο candidate ταιριάζει στο training digest" }, { en: "The account was used in the incident", el: "Το account χρησιμοποιήθηκε στο incident" }, { en: "The evidence is authentic", el: "Το evidence είναι authentic" }], answer: 1, why: { en: "Password recovery and user attribution are separate questions.", el: "Ανάκτηση κωδικού και attribution είναι διαφορετικά ερωτήματα." } },
+    q(p("A password verifier is described as a one-way digest. What does recovery testing normally do?", "Ένα password verifier περιγράφεται ως μονόδρομο digest. Τι κάνει συνήθως η δοκιμή ανάκτησης;"), [p("Hashes candidate passwords and compares the results", "Υπολογίζει digest υποψήφιων κωδικών και συγκρίνει αποτελέσματα"), p("Decrypts the digest with the user's public key", "Αποκρυπτογραφεί το digest με δημόσιο κλειδί χρήστη"), p("Reads the password from a network route", "Διαβάζει τον κωδικό από διαδρομή δικτύου"), p("Changes the account owner", "Αλλάζει τον ιδιοκτήτη λογαριασμού")], 0, p("A digest is not normally decrypted; candidate values are transformed and compared under an authorized audit.", "Ένα digest συνήθως δεν αποκρυπτογραφείται· οι υποψήφιες τιμές μετασχηματίζονται και συγκρίνονται σε εξουσιοδοτημένο έλεγχο.")),
+    q(p("Why should modern password storage use a unique salt and a deliberately slow password-hashing scheme?", "Γιατί η σύγχρονη αποθήκευση κωδικών πρέπει να χρησιμοποιεί μοναδικό salt και σκόπιμα αργό password-hashing;"), [p("To reduce precomputed reuse and make large-scale guessing more expensive", "Για μείωση προϋπολογισμένων αντιστοιχιών και ακριβότερες μαζικές δοκιμές"), p("To make passwords reversible", "Για να γίνουν οι κωδικοί αναστρέψιμοι"), p("To expose the user's identity", "Για να αποκαλυφθεί η ταυτότητα χρήστη"), p("To remove the need for multifactor authentication", "Για να καταργηθεί η ανάγκη πολυπαραγοντικής ταυτοποίησης")], 0, p("Unique salts prevent identical passwords from sharing a reusable digest, while adaptive cost slows guessing.", "Τα μοναδικά salt αποτρέπουν κοινά digest για ίδιους κωδικούς, ενώ το προσαρμοζόμενο κόστος επιβραδύνει τις δοκιμές.")),
+    q(p("A candidate matches a training digest. What does that finding prove?", "Ένας υποψήφιος ταιριάζει σε training digest. Τι αποδεικνύει το εύρημα;"), [p("The candidate matches that verifier, not who entered it or when", "Ο υποψήφιος ταιριάζει στο verifier, όχι ποιος τον πληκτρολόγησε ή πότε"), p("A named employee used the account during an incident", "Συγκεκριμένος υπάλληλος χρησιμοποίησε τον λογαριασμό στο συμβάν"), p("The original evidence is authentic", "Τα αρχικά στοιχεία είναι αυθεντικά"), p("The account has administrator rights", "Ο λογαριασμός έχει δικαιώματα διαχειριστή")], 0, p("Credential matching and user attribution are separate investigative questions requiring separate evidence.", "Η αντιστοίχιση διαπιστευτηρίων και η απόδοση σε χρήστη είναι διαφορετικά ερευνητικά ερωτήματα και χρειάζονται ξεχωριστά στοιχεία.")),
   ],
 };
+
+// Keep every published lab complete: educational theory, explained hands-on
+// objectives, and its own transfer-focused assessment are required curriculum.
+for (const campaign of CAMPAIGNS) {
+  for (const learningModule of campaign.modules) {
+    if (!learningModule.theory.length || learningModule.theory.some(section => !section.heading.en.trim() || !section.body.en.trim())) {
+      throw new Error(`Learning lab ${learningModule.id} must include explanatory theory.`);
+    }
+    if (!learningModule.tasks.length || learningModule.tasks.some(task => !task.instruction.en.trim() || !task.explain.en.trim())) {
+      throw new Error(`Learning lab ${learningModule.id} must include explained lab objectives.`);
+    }
+    if (!QUIZZES[learningModule.id] || QUIZZES[learningModule.id].length < 3) {
+      throw new Error(`Learning lab ${learningModule.id} must include a three-question assessment.`);
+    }
+  }
+}
