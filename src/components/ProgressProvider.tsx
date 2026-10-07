@@ -12,6 +12,18 @@ type ProgressStore = {
 
 const ProgressContext = createContext<ProgressStore | null>(null);
 
+const REQUEST_TIMEOUT_MS = 10_000;
+
+async function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function createProgressStore(initial: ProgressSnapshot): ProgressStore {
   let snapshot = initial;
   let serialized = JSON.stringify(initial);
@@ -26,7 +38,7 @@ function createProgressStore(initial: ProgressSnapshot): ProgressStore {
   };
   const refresh = async () => {
     const requestId = ++requestNumber;
-    const response = await fetch("/api/progress", { cache: "no-store" });
+    const response = await fetchWithTimeout("/api/progress", { cache: "no-store" });
     if (!response.ok) throw new Error("Could not load your progress.");
     const updated = await response.json() as ProgressSnapshot;
     // An older request must never replace newer progress, and unchanged data
@@ -45,7 +57,7 @@ function createProgressStore(initial: ProgressSnapshot): ProgressStore {
     if (!snapshot.isPreview) return Promise.resolve();
     if (!sessionPromise) {
       sessionPromise = (async () => {
-        const response = await fetch("/api/session", { method: "POST", cache: "no-store" });
+        const response = await fetchWithTimeout("/api/session", { method: "POST", cache: "no-store" });
         if (!response.ok) throw new Error("Could not start your guest session.");
         await refresh();
       })().finally(() => { sessionPromise = null; });
